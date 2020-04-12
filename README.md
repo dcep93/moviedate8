@@ -2,7 +2,7 @@
 
 ### Description
 
-This Chrome Extension enables friends to watch a video at the same time without screencasting.  
+This Chrome Extension enables friends to watch a video at the same time in original quality without screencasting.  
 All users are required to have access to the video.
 
 ### To Install
