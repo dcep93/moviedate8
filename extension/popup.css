@@ -1,0 +1,22 @@
+.column {
+	display: inline-block;
+	margin: 5px;
+}
+
+#form {
+	display: flex;
+	height: auto;
+}
+
+#buttons {
+	text-align: center;
+	align-self: center;
+}
+
+#tap_parent {
+	text-align: center;
+}
+
+#tap {
+	font-size: large;
+}

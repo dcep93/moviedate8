@@ -1,0 +1,30 @@
+{
+	"name": "Loopy Goopy",
+	"description": "Practice tool that finds audio/video tags and allows you to loop or control speed.",
+	"version": "1.0.0",
+	"permissions": ["storage"],
+	"icons": {
+		"16": "loopy_goopy_full.png",
+		"48": "loopy_goopy_full.png",
+		"128": "loopy_goopy_full.png"
+	},
+	"background": {
+		"scripts": ["background.js"],
+		"persistent": false
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"https://open.spotify.com/*",
+				"https://www.youtube.com/*"
+			],
+			"js": ["content_script.js"]
+		}
+	],
+	"web_accessible_resources": ["inject_spotify.js"],
+	"browser_action": {
+		"default_popup": "popup.html",
+		"default_icon": "loopy_goopy_full.png"
+	},
+	"manifest_version": 2
+}

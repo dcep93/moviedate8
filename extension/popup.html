@@ -1,0 +1,41 @@
+<form id="form">
+	<div class="column">
+		<span
+			>Original BPM:
+			<input id="bpm" name="bpm" type="number" step="0.01" value="80"
+		/></span>
+		<span
+			>Beats Per Loop:
+			<input name="bpl" type="number" step="0.01" value="4"
+		/></span>
+		<span
+			>Beats to Rest:
+			<input name="bpr" type="number" step="0.01" value="0"
+		/></span>
+	</div>
+	<div class="column">
+		<span
+			>Tempo Change: <input name="tc" type="number" step="0.01" value="1"
+		/></span>
+		<span
+			>Tempo Target: <input name="tt" type="number" step="0.01" value="1"
+		/></span>
+		<span
+			>Tempo Loops: <input name="tl" type="number" step="0.01" value="0"
+		/></span>
+	</div>
+	<div class="column">
+		<div>Start Time:</div>
+		<input id="st" name="st" type="number" step="0.01" value="" />
+		<div>Tap To Determine BPM:</div>
+		<div id="tap_parent"><button type="button" id="tap">Tap</button></div>
+	</div>
+	<div class="column" id="buttons">
+		<button type="button" id="start">Start</button>
+		<button type="button" id="stop">Stop</button>
+		<button type="button" id="next">Next</button>
+		<button type="button" id="previous">Previous</button>
+	</div>
+</form>
+<link rel="stylesheet" type="text/css" href="popup.css" />
+<script type="text/javascript" src="popup.js"></script>
