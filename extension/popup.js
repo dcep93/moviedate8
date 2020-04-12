@@ -77,7 +77,7 @@ function setPeers(val_) {
 	for (var i = 0; i < peers.length; i++) {
 		let key = peers[i];
 		var peer = val[key];
-		// if (peer.email === email) continue;
+		if (peer.email === email) continue;
 		if (tooOld(peer)) continue;
 		var id = `peer-${key}`.replace(/@/g, "_");
 		var peerDiv = peersDiv.querySelector(`#${id}`);
