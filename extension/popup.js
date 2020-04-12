@@ -36,8 +36,8 @@ function setPopupState(state) {
 
 function tooOld(peer) {
 	var ageMs = Date.now() - peer.date;
-	var tenMinutes = 1000 * 60 * 10;
-	return ageMs > tenMinutes;
+	var oneMinute = 1000 * 60;
+	return ageMs > oneMinute;
 }
 
 function submitForm() {

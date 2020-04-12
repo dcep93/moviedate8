@@ -11,7 +11,8 @@
 		{
 			"matches": [
 				"https://www.dropbox.com/*",
-				"https://www.youtube.com/*"
+				"https://www.youtube.com/*",
+				"file:///*"
 			],
 			"js": ["content_script.js"]
 		}

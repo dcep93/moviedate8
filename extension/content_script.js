@@ -47,7 +47,7 @@ function set() {
 }
 
 function getId() {
-	var rawId = `${window.location.host}/${element.duration}`;
+	var rawId = `${window.location.host || "local"}/${element.duration}`;
 	return rawId.replace(/\./g, "_");
 }
 
