@@ -7,7 +7,7 @@ All users are required to have access to the video.
 
 ### To Install
 
-1. Download [zip](https://github.com/dcep93/uhohsynchy/releases/tag/v1.0.0) and unzip.
+1. Download [zip](https://github.com/dcep93/uhohsynchy/releases) and unzip.
 2. Visit [chrome://extensions](chrome://extensions) and load "extension" folder as an unpacked extension.
 
 ### To Use
