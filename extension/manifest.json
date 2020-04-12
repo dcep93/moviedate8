@@ -2,7 +2,6 @@
 	"name": "Uh Oh Synchy",
 	"description": "Synchs videos for people watching the same video at the same time.",
 	"version": "0.0.1",
-	"permissions": [],
 	"icons": {
 		"16": "uhohsynchy.png",
 		"48": "uhohsynchy.png",
@@ -21,5 +20,7 @@
 		"default_popup": "popup.html",
 		"default_icon": "uhohsynchy.png"
 	},
-	"manifest_version": 2
+	"permissions": ["identity", "identity.email"],
+	"manifest_version": 2,
+	"content_security_policy": "script-src 'self' https://*.firebaseio.com; object-src 'self'"
 }

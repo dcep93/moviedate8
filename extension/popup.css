@@ -1,22 +1,29 @@
-.column {
-	display: inline-block;
-	margin: 5px;
+#top {
+	display: flex;
+	align-items: center;
 }
 
 #form {
+	margin-bottom: 0;
+}
+
+#peers {
 	display: flex;
+}
+
+.peer_stats {
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+}
+
+.bubble {
+	border-radius: 15px;
+	border: 2px solid black;
+	padding: 13px;
+	margin: 13px;
+}
+
+#you {
 	height: auto;
-}
-
-#buttons {
-	text-align: center;
-	align-self: center;
-}
-
-#tap_parent {
-	text-align: center;
-}
-
-#tap {
-	font-size: large;
 }

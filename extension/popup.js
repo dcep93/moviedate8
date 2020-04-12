@@ -1,132 +1,163 @@
-var tabId;
-chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-	tabId = tabs[0].id;
-	chrome.tabs.sendMessage(tabId, { type: "init", tabId }, (response) => {
+var PREFIX = "data";
+var FREQUENCY = 1000;
+
+var speedInput = document.getElementById("speed");
+var timeInput = document.getElementById("time");
+
+var form = document.getElementById("form");
+
+var peerTemplate = document.getElementById("peer_template");
+var peersDiv = peerTemplate.parentElement;
+
+var val;
+
+var db;
+var listenerRef;
+
+var email;
+
+var selfDate;
+
+// should be same as content_script.js
+function determineTime(state) {
+	var ageMs = Date.now() - state.date;
+	var secondsAdvanced = (ageMs * state.speed) / 1000;
+	console.log(new Date(), state.time + secondsAdvanced);
+	return state.time + secondsAdvanced;
+}
+
+function setPopupState(state) {
+	if (document.activeElement && document.activeElement.tagName == "INPUT")
+		return;
+	speedInput.value = state.speed.toFixed(2);
+	timeInput.value = determineTime(state).toFixed(2);
+}
+
+function tooOld(peer) {
+	var ageMs = Date.now() - peer.date;
+	var tenMinutes = 1000 * 60 * 10;
+	return ageMs > tenMinutes;
+}
+
+function submitForm() {
+	var speed = speedInput.value;
+	var time = timeInput.value;
+	setElementState({ speed, time });
+}
+
+function setElementState(state) {
+	chrome.tabs.sendMessage(tabId, { type: "sync", state }, function (
+		response
+	) {
 		if (response === undefined) {
-			tabId = undefined;
 			allowNonValidPage();
-		} else if (response === true) {
-			// send message to background
-			chrome.runtime.sendMessage({ tabId });
+		} else if (response !== true) {
+			window.close();
+			return alert(response);
+		}
+	});
+}
+
+function sync(key) {
+	if (tabId === undefined) return alert("sync error");
+	var state = val[key];
+	setElementState(state);
+}
+
+form.submit = submitForm;
+
+peersDiv.removeChild(peerTemplate);
+peerTemplate.hidden = false;
+peerTemplate.removeAttribute("id");
+function setPeers(val_) {
+	val = val_;
+	if (notMyUpdate(val_)) return;
+	var peers = Object.keys(val);
+	for (var i = 0; i < peers.length; i++) {
+		let key = peers[i];
+		var peer = val[key];
+		// if (peer.email === email) continue;
+		if (tooOld(peer)) continue;
+		var id = `peer-${key}`.replace(/@/g, "_");
+		var peerDiv = peersDiv.querySelector(`#${id}`);
+		if (!peerDiv) {
+			peerDiv = peerTemplate.cloneNode(true);
+			peerDiv.querySelector(".peer_email").innerText = peer.email;
+			peerDiv.querySelector(".peer_sync").onclick = () => {
+				sync(key);
+			};
+			peersDiv.appendChild(peerDiv);
+		}
+		peerDiv.setAttribute("id", id);
+		peerDiv.querySelector(".peer_speed").innerText = peer.speed.toFixed(2);
+		peerDiv.querySelector(".peer_time").innerText = determineTime(
+			peer
+		).toFixed(2);
+	}
+}
+
+function notMyUpdate(val) {
+	var me = Object.values(val).filter((peer) => peer.email === email)[0];
+	if (me) {
+		var date = me.date;
+		if (date !== selfDate) {
+			selfDate = date;
+			return true;
+		}
+	}
+	return false;
+}
+
+function queryTab() {
+	if (tabId === undefined) return;
+	chrome.tabs.sendMessage(tabId, { type: "query" }, function (response) {
+		if (response === undefined) {
+			allowNonValidPage();
+		} else if (response.id !== undefined) {
+			postToFirebase(response);
 		} else {
 			window.close();
 			return alert(response);
 		}
 	});
-});
-
-function allowNonValidPage() {
-	// means this is a non-spotify/youtube page - this is fine
-	chrome.runtime.lastError;
 }
 
-//
-
-var mediaId;
-
-var stInput = document.getElementById("st");
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-	console.log(message, sender);
-	// write start time based on state on the page
-	if (message.startTime) stInput.value = message.startTime.toFixed(2);
-	// load saved form data
-	if (mediaId !== message.mediaId) {
-		mediaId = message.mediaId;
-		loadForm(mediaId);
-	}
-	sendResponse(true);
-});
-
-//
-
-var form = document.getElementById("form");
-
-function saveForm(id) {
-	var formData = new FormData(form);
-	var message = {};
-	formData.forEach((value, key) => {
-		message[key] = value;
-	});
-	if (id) chrome.storage.sync.set({ [id]: message });
-	console.log("save", id, message);
-	return message;
+function initializeFirebase() {
+	var config = {
+		databaseURL: "https://uhohsynchy.firebaseio.com",
+	};
+	firebase.initializeApp(config);
+	db = firebase.database();
+	queryTab();
+	setInterval(queryTab, FREQUENCY);
 }
 
-function loadForm(id) {
-	console.log("load", id);
-	chrome.storage.sync.get([id], function (result) {
-		var object = result[id];
-		console.log("set", id, object);
-		for (var name in object) form[name].value = object[name];
+function postToFirebase(state) {
+	if (setPopupState(state)) return;
+	if (db === undefined) return;
+	var emailKey = email.replace(/\./g, "_");
+	var path = [PREFIX, state.id, emailKey].join("/");
+	state.email = email;
+	db.ref(path).set(state).catch(alert);
+
+	listen(state.id);
+}
+
+function listen(id) {
+	if (listenerRef !== undefined) listenerRef.off();
+	listenerRef = db.ref(`${PREFIX}/${id}`);
+	listenerRef.on("value", function (snapshot) {
+		var val = snapshot.val();
+		setPeers(val);
 	});
 }
 
-function saveDefault() {
-	saveForm("default");
+function fetchEmailAndInitializeFirebase() {
+	chrome.identity.getProfileUserInfo(function (info) {
+		email = info.email;
+		document.getElementById("email").innerText = email;
+		initializeFirebase();
+	});
 }
 
-loadForm("default");
-
-//
-
-// you can hit 'enter' while focused on any input
-var submitInput = document.createElement("input");
-submitInput.type = "submit";
-submitInput.style = "display: none";
-var inputsRaw = document.getElementsByTagName("input");
-var inputs = Array.from(inputsRaw);
-for (var i = 0; i < inputs.length; i++) {
-	var element = inputs[i];
-	// when the input changes, save the state as
-	// the last thing opened, 'default'
-	element.onchange = saveDefault;
-	element.parentElement.insertBefore(
-		submitInput.cloneNode(),
-		element.nextSibling
-	);
-}
-// chrome seems to size the popup strangely
-document.getElementsByTagName("html")[0].style.height = form.offsetHeight;
-
-//
-
-function sendMessage(type) {
-	var message = saveForm(mediaId);
-	var data = { type, message };
-	if (tabId !== undefined) {
-		chrome.tabs.sendMessage(tabId, data);
-	} else {
-		chrome.runtime.sendMessage(data, function (response) {
-			if (!response)
-				alert(
-					"Need to initialize on either youtube.com or open.spotify.com"
-				);
-		});
-	}
-	return false;
-}
-
-var buttonNames = ["start", "stop", "next", "previous"];
-buttonNames.forEach((type) => {
-	document.getElementById(type).onclick = () => sendMessage(type);
-});
-
-form.onsubmit = () => sendMessage("start");
-
-//
-
-var taps = [];
-var numTaps = 10;
-var msPM = 1000 * 60;
-var bpmInput = document.getElementById("bpm");
-function tap() {
-	var now = new Date();
-	taps.push(now);
-	if (taps.length > numTaps) taps.shift();
-	var ms = now - taps[0];
-	var bpm = (msPM * (taps.length - 1)) / ms;
-	if (bpm && bpm !== Infinity) {
-		bpmInput.value = bpm.toFixed(2);
-	}
-}
-document.getElementById("tap").onclick = tap;
+window.onload = fetchEmailAndInitializeFirebase;

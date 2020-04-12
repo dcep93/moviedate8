@@ -1,41 +1,56 @@
-<form id="form">
-	<div class="column">
-		<span
-			>Original BPM:
-			<input id="bpm" name="bpm" type="number" step="0.01" value="80"
-		/></span>
-		<span
-			>Beats Per Loop:
-			<input name="bpl" type="number" step="0.01" value="4"
-		/></span>
-		<span
-			>Beats to Rest:
-			<input name="bpr" type="number" step="0.01" value="0"
-		/></span>
+<html>
+	<div id="top">
+		<div id="peers">
+			<div hidden id="peer_template" class="bubble">
+				<div class="peer_email">email@example.com</div>
+				<div class="peer_stats">
+					<span>
+						<div>x<span class="peer_speed">1.0</span></div>
+						<div class="peer_time">4.20</div></span
+					>
+					<span><button class="peer_sync">Sync</button></span>
+				</div>
+			</div>
+		</div>
+		<div id="you">
+			<form id="form">
+				<div id="email">@</div>
+				<div>
+					Playback Speed
+					<input
+						id="speed"
+						name="speed"
+						type="number"
+						step="0.01"
+						value=""
+					/>
+					<input type="submit" hidden />
+				</div>
+				<div>
+					Current Time
+					<input
+						id="time"
+						name="time"
+						type="number"
+						step="0.01"
+						value=""
+					/>
+					<input type="submit" hidden />
+				</div>
+			</form>
+		</div>
+		<div hidden>
+			<link rel="stylesheet" type="text/css" href="popup.css" />
+			<script
+				type="text/javascript"
+				src="firebase/firebase-app.js"
+			></script>
+			<script
+				type="text/javascript"
+				src="firebase/firebase-database.js"
+			></script>
+			<script type="text/javascript" src="common.js"></script>
+			<script type="text/javascript" src="popup.js"></script>
+		</div>
 	</div>
-	<div class="column">
-		<span
-			>Tempo Change: <input name="tc" type="number" step="0.01" value="1"
-		/></span>
-		<span
-			>Tempo Target: <input name="tt" type="number" step="0.01" value="1"
-		/></span>
-		<span
-			>Tempo Loops: <input name="tl" type="number" step="0.01" value="0"
-		/></span>
-	</div>
-	<div class="column">
-		<div>Start Time:</div>
-		<input id="st" name="st" type="number" step="0.01" value="" />
-		<div>Tap To Determine BPM:</div>
-		<div id="tap_parent"><button type="button" id="tap">Tap</button></div>
-	</div>
-	<div class="column" id="buttons">
-		<button type="button" id="start">Start</button>
-		<button type="button" id="stop">Stop</button>
-		<button type="button" id="next">Next</button>
-		<button type="button" id="previous">Previous</button>
-	</div>
-</form>
-<link rel="stylesheet" type="text/css" href="popup.css" />
-<script type="text/javascript" src="popup.js"></script>
+</html>
