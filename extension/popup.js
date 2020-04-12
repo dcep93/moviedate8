@@ -1,3 +1,5 @@
+// https://console.firebase.google.com/u/0/project/uhohsynchy/database/uhohsynchy/data
+
 var PREFIX = "data";
 var FREQUENCY = 1000;
 
