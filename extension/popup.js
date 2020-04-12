@@ -22,7 +22,6 @@ var selfDate;
 function determineTime(state) {
 	var ageMs = Date.now() - state.date;
 	var secondsAdvanced = (ageMs * state.speed) / 1000;
-	console.log(new Date(), state.time + secondsAdvanced);
 	return state.time + secondsAdvanced;
 }
 
@@ -42,7 +41,9 @@ function tooOld(peer) {
 function submitForm() {
 	var speed = speedInput.value;
 	var time = timeInput.value;
-	setElementState({ speed, time });
+	var date = Date.now();
+	setElementState({ speed, time, date });
+	return false;
 }
 
 function setElementState(state) {
@@ -64,7 +65,7 @@ function sync(key) {
 	setElementState(state);
 }
 
-form.submit = submitForm;
+form.onsubmit = submitForm;
 
 peersDiv.removeChild(peerTemplate);
 peerTemplate.hidden = false;

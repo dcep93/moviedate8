@@ -1,7 +1,7 @@
 {
 	"name": "Uh Oh Synchy",
 	"description": "Synchs videos for people watching the same video at the same time.",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"icons": {
 		"16": "uhohsynchy.png",
 		"48": "uhohsynchy.png",
