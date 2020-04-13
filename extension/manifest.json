@@ -1,11 +1,11 @@
 {
-	"name": "Uh Oh Synchy",
+	"name": "Movie Date",
 	"description": "Synchs videos for people watching the same video at the same time.",
-	"version": "1.0.1",
+	"version": "2.0.0",
 	"icons": {
-		"16": "uhohsynchy.png",
-		"48": "uhohsynchy.png",
-		"128": "uhohsynchy.png"
+		"16": "moviedate.png",
+		"48": "moviedate.png",
+		"128": "moviedate.png"
 	},
 	"content_scripts": [
 		{
@@ -19,7 +19,7 @@
 	],
 	"browser_action": {
 		"default_popup": "popup.html",
-		"default_icon": "uhohsynchy.png"
+		"default_icon": "moviedate.png"
 	},
 	"permissions": ["identity", "identity.email"],
 	"manifest_version": 2,

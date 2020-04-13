@@ -1,4 +1,4 @@
-// https://console.firebase.google.com/u/0/project/uhohsynchy/database/uhohsynchy/data
+// https://console.firebase.google.com/u/0/project/moviedatesync/database/moviedatesync/data
 
 var PREFIX = "data";
 var FREQUENCY = 1000;
@@ -127,7 +127,7 @@ function queryTab() {
 
 function initializeFirebase() {
 	var config = {
-		databaseURL: "https://uhohsynchy.firebaseio.com",
+		databaseURL: "https://moviedatesync.firebaseio.com",
 	};
 	firebase.initializeApp(config);
 	db = firebase.database();
