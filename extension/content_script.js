@@ -2,9 +2,10 @@ var element;
 
 // should be same as popup.js
 function determineTime(state) {
-	var ageMs = Date.now() - state.date;
-	var secondsAdvanced = (ageMs * state.speed) / 1000;
-	return state.time + secondsAdvanced;
+	if (state.paused) return state.time;
+	var ageMs = Date.now() - parseInt(state.date);
+	var secondsAdvanced = (ageMs * parseFloat(state.speed)) / 1000;
+	return parseFloat(state.time) + secondsAdvanced;
 }
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
@@ -37,8 +38,9 @@ function query(sendResponse) {
 	var id = getId();
 	var speed = getSpeed();
 	var time = getTime();
+	var paused = getPaused();
 	var date = Date.now();
-	var state = { id, speed, time, date };
+	var state = { id, speed, time, paused, date };
 	sendResponse(state);
 }
 
@@ -57,6 +59,10 @@ function getSpeed() {
 
 function getTime() {
 	return element.currentTime;
+}
+
+function getPaused() {
+	return element.paused;
 }
 
 function sync(sendResponse, state) {

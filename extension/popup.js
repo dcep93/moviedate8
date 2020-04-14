@@ -22,9 +22,10 @@ var selfDate;
 
 // should be same as content_script.js
 function determineTime(state) {
-	var ageMs = Date.now() - state.date;
-	var secondsAdvanced = (ageMs * state.speed) / 1000;
-	return state.time + secondsAdvanced;
+	if (state.paused) return state.time;
+	var ageMs = Date.now() - parseInt(state.date);
+	var secondsAdvanced = (ageMs * parseFloat(state.speed)) / 1000;
+	return parseFloat(state.time) + secondsAdvanced;
 }
 
 function setPopupState(state) {
@@ -96,6 +97,11 @@ function setPeers(val_) {
 		peerDiv.querySelector(".peer_time").innerText = determineTime(
 			peer
 		).toFixed(2);
+		if (peer.paused) {
+			peerDiv.classList.add("paused");
+		} else {
+			peerDiv.classList.remove("paused");
+		}
 	}
 }
 

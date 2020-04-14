@@ -27,3 +27,7 @@
 #you {
 	height: auto;
 }
+
+.paused {
+	background-color: lightgray;
+}
