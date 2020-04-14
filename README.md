@@ -8,7 +8,10 @@ All users are required to have access to the video.
 ### To Install
 
 1. Download [zip](https://github.com/dcep93/moviedate/releases) and unzip.
-2. Visit [chrome://extensions](chrome://extensions) and load "extension" folder as an unpacked extension.
+2. Visit [chrome://extensions](chrome://extensions)
+3. Select "developer mode"
+4. Select "load unpacked extension"
+5. Select the "extension" folder
 
 ### To Use
 
