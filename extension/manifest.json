@@ -1,11 +1,11 @@
 {
 	"name": "Movie Date",
-	"description": "Synchs videos for people watching the same video at the same time.",
-	"version": "2.0.0",
+	"description": "Syncs videos for people watching the same video at the same time.",
+	"version": "2.1.0",
 	"icons": {
 		"16": "moviedate.png",
 		"48": "moviedate.png",
-		"128": "moviedate.png"
+		"128": "moviedate_128.png"
 	},
 	"content_scripts": [
 		{
