@@ -30,10 +30,11 @@ function queryTab() {
 }
 
 function submitForm() {
-	var speed = speedInput.value;
-	var time = timeInput.value;
 	var date = Date.now();
-	setElementState({ speed, time, date });
+	var state = { date };
+	if (document.activeElement === speedInput) state.speed = speedInput.value;
+	if (document.activeElement === timeInput) state.time = timeInput.value;
+	setElementState(state);
 	return false;
 }
 
@@ -63,10 +64,10 @@ function setPopupState(state) {
 
 function setSelfState(self) {
 	emailDiv.innerText = self.email;
-	if (document.activeElement && document.activeElement.tagName == "INPUT")
-		return;
-	speedInput.value = self.speed.toFixed(2);
-	timeInput.value = determineTime(self).toFixed(2);
+	if (document.activeElement !== speedInput)
+		speedInput.value = self.speed.toFixed(2);
+	if (document.activeElement !== timeInput)
+		timeInput.value = determineTime(self).toFixed(2);
 }
 
 peersDiv.removeChild(peerTemplate);
