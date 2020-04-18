@@ -1,12 +1,7 @@
-var element;
+var email;
+var peers;
 
-// should be same as popup.js
-function determineTime(state) {
-	if (state.paused) return state.time;
-	var ageMs = Date.now() - parseInt(state.date);
-	var secondsAdvanced = (ageMs * parseFloat(state.speed)) / 1000;
-	return parseFloat(state.time) + secondsAdvanced;
-}
+var element;
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 	console.log("receive", message);
@@ -27,45 +22,21 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 	}
 });
 
-function init(sendResponse) {
-	set();
+function init(sendResponse, message) {
+	element = document.getElementsByTagName("video")[0];
 	if (element === undefined || isNaN(element.duration))
 		return sendResponse("no video found");
+	email = message.email;
+	if (db === undefined) beginReporting();
 	sendResponse(true);
 }
 
 function query(sendResponse) {
-	var id = getId();
-	var speed = getSpeed();
-	var time = getTime();
-	var paused = getPaused();
-	var date = Date.now();
-	var state = { id, speed, time, paused, date };
-	sendResponse(state);
-}
-
-function set() {
-	element = document.getElementsByTagName("video")[0];
-}
-
-function getId() {
-	var rawId = `${window.location.host || "local"}`;
-	return rawId.replace(/\./g, "_");
-}
-
-function getSpeed() {
-	return element.playbackRate;
-}
-
-function getTime() {
-	return element.currentTime;
-}
-
-function getPaused() {
-	return element.paused;
+	sendResponse({ email, peers });
 }
 
 function sync(sendResponse, state) {
+	console.log(state);
 	if (state.speed) element.playbackRate = state.speed;
 	if (state.time) element.currentTime = determineTime(state);
 	if (state.paused !== undefined) {

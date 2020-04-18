@@ -15,7 +15,13 @@
 				"https://www.netflix.com/*",
 				"file:///*"
 			],
-			"js": ["content_script.js"]
+			"js": [
+				"content_script.js",
+				"content_script_firebase.js",
+				"determine_time.js",
+				"firebase/firebase-app.js",
+				"firebase/firebase-database.js"
+			]
 		}
 	],
 	"browser_action": {
