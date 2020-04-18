@@ -83,7 +83,7 @@ function setPeers(val_) {
 		var peer = val[key];
 		if (peer.email === email) continue;
 		if (tooOld(peer)) continue;
-		var id = `peer-${key}`.replace(/@/g, "_");
+		var id = `peer-${key}`.replace(/@/g, "_").replace(/\?/g, "_");
 		var peerDiv = peersDiv.querySelector(`#${id}`);
 		if (!peerDiv) {
 			peerDiv = peerTemplate.cloneNode(true);
