@@ -36,6 +36,7 @@ function setPopupState(state) {
 }
 
 function tooOld(peer) {
+	return false;
 	var ageMs = Date.now() - peer.date;
 	var oneMinute = 1000 * 60;
 	return ageMs > oneMinute;
@@ -163,7 +164,7 @@ function listen(id) {
 
 function fetchEmailAndInitializeFirebase() {
 	chrome.identity.getProfileUserInfo(function (info) {
-		email = info.email;
+		email = info.email || "?";
 		document.getElementById("email").innerText = email;
 		initializeFirebase();
 	});
