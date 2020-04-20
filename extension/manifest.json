@@ -18,6 +18,7 @@
 			"js": [
 				"content_script.js",
 				"content_script_firebase.js",
+				"content_script_inject.js",
 				"determine_time.js",
 				"firebase/firebase-app.js",
 				"firebase/firebase-database.js"
@@ -28,6 +29,7 @@
 		"default_popup": "popup.html",
 		"default_icon": "moviedate.png"
 	},
+	"web_accessible_resources": ["inject_netflix.js"],
 	"permissions": ["identity", "identity.email"],
 	"manifest_version": 2,
 	"content_security_policy": "script-src 'self' https://*.firebaseio.com; object-src 'self'"

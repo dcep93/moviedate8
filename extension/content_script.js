@@ -9,8 +9,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 		console.log("send", response) || sendResponse(response);
 	switch (message.type) {
 		case "init":
-			init(respond, message);
-			break;
+			return init(respond, message);
 		case "query":
 			query(respond, message);
 			break;
@@ -28,7 +27,7 @@ function init(sendResponse, message) {
 		return sendResponse("no video found");
 	email = message.email;
 	if (db === undefined) beginReporting();
-	sendResponse(true);
+	return handleInject(sendResponse);
 }
 
 function query(sendResponse) {
@@ -38,7 +37,7 @@ function query(sendResponse) {
 function sync(sendResponse, state) {
 	console.log(state);
 	if (state.speed) element.playbackRate = state.speed;
-	if (state.time) element.currentTime = determineTime(state);
+	if (state.time) setTime(state);
 	if (state.paused !== undefined) {
 		if (state.paused) {
 			element.pause();
@@ -47,4 +46,12 @@ function sync(sendResponse, state) {
 		}
 	}
 	sendResponse(true);
+}
+
+function setTime(state) {
+	if (inject !== null) {
+		injectedElement.value = JSON.stringify(state);
+	} else {
+		element.currentTime = determineTime(state);
+	}
 }
