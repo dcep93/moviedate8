@@ -4,7 +4,7 @@ var peers;
 var element;
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-	console.log("receive", message);
+	console.log("receive", message.type, message);
 	var respond = (response) =>
 		console.log("send", response) || sendResponse(response);
 	switch (message.type) {
@@ -35,23 +35,18 @@ function query(sendResponse) {
 }
 
 function sync(sendResponse, state) {
-	console.log(state);
-	if (state.speed) element.playbackRate = state.speed;
-	if (state.time) setTime(state);
-	if (state.paused !== undefined) {
-		if (state.paused) {
-			element.pause();
-		} else {
-			element.play();
-		}
-	}
-	sendResponse(true);
-}
-
-function setTime(state) {
 	if (inject !== null) {
 		injectedElement.value = JSON.stringify(state);
 	} else {
-		element.currentTime = determineTime(state);
+		if (state.speed) element.playbackRate = state.speed;
+		if (state.time) element.currentTime = determineTime(state);
+		if (state.paused !== undefined) {
+			if (state.paused) {
+				element.pause();
+			} else {
+				element.play();
+			}
+		}
 	}
+	sendResponse(true);
 }

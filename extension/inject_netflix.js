@@ -7,10 +7,21 @@
 		videoPlayer.getAllPlayerSessionIds()[0]
 	);
 
-	function setTime(timeS) {
+	function setSpeed(state) {
+		player.setPlaybackRate(state.speed);
+	}
+
+	function setTime(state) {
+		var timeS = determineTime(state);
 		var timeMS = timeS * 1000;
 		player.seek(timeMS);
 	}
+
+	function setPaused(state) {
+		var f = state.paused ? "pause" : "play";
+		player[f]();
+	}
+
 	// Netflix specific end
 
 	const CHECK_FREQUENCY = 10;
@@ -34,8 +45,9 @@
 		if (value !== seen) {
 			seen = value;
 			var state = JSON.parse(value);
-			var timeS = determineTime(state);
-			setTime(timeS);
+			if (state.speed) setSpeed(state);
+			if (state.time) setTime(state);
+			if (state.paused !== undefined) setPaused(state);
 		}
 	}
 
