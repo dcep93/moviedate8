@@ -45,8 +45,8 @@
 		if (value !== seen) {
 			seen = value;
 			var state = JSON.parse(value);
-			if (state.speed) setSpeed(state);
-			if (state.time) setTime(state);
+			if (state.speed !== undefined) setSpeed(state);
+			if (state.time !== undefined) setTime(state);
 			if (state.paused !== undefined) setPaused(state);
 		}
 	}

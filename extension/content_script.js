@@ -38,8 +38,9 @@ function sync(sendResponse, state) {
 	if (inject !== null) {
 		injectedElement.value = JSON.stringify(state);
 	} else {
-		if (state.speed) element.playbackRate = state.speed;
-		if (state.time) element.currentTime = determineTime(state);
+		if (state.speed !== undefined) element.playbackRate = state.speed;
+		if (state.time !== undefined)
+			element.currentTime = determineTime(state);
 		if (state.paused !== undefined) {
 			if (state.paused) {
 				element.pause();
