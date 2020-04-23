@@ -30,23 +30,27 @@ function queryTab() {
 }
 
 function submitForm() {
+	if (tabId === undefined) return alert("script not loaded");
 	var date = Date.now();
 	var state = { date };
 	if (document.activeElement === speedInput) state.speed = speedInput.value;
 	if (document.activeElement === timeInput) state.time = timeInput.value;
-	setElementState(state);
+	chrome.tabs.sendMessage(tabId, { type: "set_state", state }, function (
+		response
+	) {
+		if (response === undefined) {
+			allowNonValidPage();
+		} else if (response !== true) {
+			window.close();
+			return alert(response);
+		}
+	});
 	return false;
 }
 
-function sync(state) {
+function sync(key) {
 	if (tabId === undefined) return alert("sync error");
-	setElementState(state);
-}
-
-function setElementState(state) {
-	chrome.tabs.sendMessage(tabId, { type: "sync", state }, function (
-		response
-	) {
+	chrome.tabs.sendMessage(tabId, { type: "sync", key }, function (response) {
 		if (response === undefined) {
 			allowNonValidPage();
 		} else if (response !== true) {
@@ -76,8 +80,8 @@ peerTemplate.removeAttribute("id");
 function setPeers(peers, email) {
 	var keys = Object.keys(peers);
 	for (var i = 0; i < keys.length; i++) {
-		var key = keys[i];
-		let peer = peers[key];
+		let key = keys[i];
+		var peer = peers[key];
 		if (peer.email === email) {
 			setSelfState(peer);
 			continue;
@@ -89,7 +93,7 @@ function setPeers(peers, email) {
 			peerDiv = peerTemplate.cloneNode(true);
 			peerDiv.querySelector(".peer_email").innerText = peer.email;
 			peerDiv.querySelector(".peer_sync").onclick = () => {
-				sync(peer);
+				sync(key);
 			};
 			peerDiv.setAttribute("id", id);
 			peersDiv.appendChild(peerDiv);

@@ -23,16 +23,16 @@ function reportState() {
 	var time = element.currentTime;
 	var paused = element.paused;
 	var date = Date.now();
-	var state = { id, email, speed, time, paused, date };
+	var args = { id, email, speed, time, paused, date };
 
-	postToFirebase(state);
+	postToFirebase(args);
 }
 
-function postToFirebase(state) {
-	var emailKey = state.email.replace(/\./g, "_");
-	var firebaseId = [PREFIX, state.id].join("/");
+function postToFirebase(args) {
+	var emailKey = args.email.replace(/\./g, "_");
+	var firebaseId = [PREFIX, args.id].join("/");
 	var path = [firebaseId, emailKey].join("/");
-	db.ref(path).set(state).catch(alert);
+	db.ref(path).set(args).catch(alert);
 
 	listen(firebaseId);
 }
