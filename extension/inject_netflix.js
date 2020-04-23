@@ -38,16 +38,14 @@
 		return parseFloat(state.time) + secondsAdvanced;
 	}
 
-	var seen = "";
-
 	function checkForChange() {
 		var value = injectedElement.value;
-		if (value !== seen) {
-			seen = value;
+		if (value) {
 			var state = JSON.parse(value);
 			if (state.speed !== undefined) setSpeed(state);
 			if (state.time !== undefined) setTime(state);
 			if (state.paused !== undefined) setPaused(state);
+			injectedElement.value = "";
 		}
 	}
 
