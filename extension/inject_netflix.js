@@ -1,6 +1,7 @@
 // Netflix doesn't let currentTime change in the regular way :/
 // use this to allow mutation
 (function () {
+	const NETFLIX_OFFSET = 0.65;
 	// Netflix specific start
 	const videoPlayer = netflix.appContext.state.playerApp.getAPI().videoPlayer;
 	const player = videoPlayer.getVideoPlayerBySessionId(
@@ -13,6 +14,7 @@
 
 	function setTime(state) {
 		var timeS = determineTime(state);
+		timeS += NETFLIX_OFFSET;
 		var timeMS = timeS * 1000;
 		player.seek(timeMS);
 	}
