@@ -82,15 +82,20 @@ function listenToPeer(path) {
 	if (syncListener !== undefined) syncListener.off();
 	syncListener = db.ref(path);
 	syncListener.on("value", function (snapshot) {
-		if (hasManuallyChanged()) return syncListener.off();
-		setStateHelper(snapshot.val());
+		var peer = snapshot.val();
+		if (expected && peer.duration === expected.duration) {
+			if (!hasManuallyChanged()) {
+				setStateHelper(peer);
+				return;
+			}
+		}
+		syncListener.off();
 	});
 }
 
 function hasManuallyChanged() {
 	if (expected === null) return true;
 	var me = getState();
-	delete me.email;
 	var meTime = determineTime(me);
 	var expectedTime = determineTime(expected);
 	var diff = Math.abs(meTime - expectedTime);
@@ -100,6 +105,8 @@ function hasManuallyChanged() {
 	}
 	delete me.date;
 	delete me.time;
+	delete me.email;
+	delete me.duration;
 	for (var key in me) {
 		if (me[key] != expected[key]) {
 			logManualChange(key, me[key], expected[key]);
