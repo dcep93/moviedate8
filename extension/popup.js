@@ -1,4 +1,4 @@
-var FREQUENCY = 1000;
+var FREQUENCY = 420;
 
 var emailDiv = document.getElementById("email");
 var speedInput = document.getElementById("speed");

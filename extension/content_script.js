@@ -8,6 +8,25 @@ var expected = null;
 
 const CHANGE_DIFF_CUTOFF = 0.5;
 const SYNC_DELAY = 5000;
+const FOLLOW_UP_DIFF_CUTOFF = 0.001;
+const FOLLOW_UP_TICKS = 5;
+const FOLLOW_UP_TICK_DURATION = 1000;
+
+function followUp(state, ticks) {
+	var stateTime = determineTime(state);
+	var diff = stateTime - element.currentTime;
+	if (Math.abs(diff) < FOLLOW_UP_DIFF_CUTOFF) {
+		element.playbackRate = state.speed;
+		return;
+	}
+	var relative = diff / FOLLOW_UP_TICK_DURATION;
+	element.playbackRate += relative;
+	if (ticks) {
+		setTimeout(() => followUp(state, ticks - 1), FOLLOW_UP_TICK_DURATION);
+	} else {
+		element.playbackRate = state.speed;
+	}
+}
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 	console.log("receive", message.type, message);
@@ -56,16 +75,18 @@ function setStateHelper(state) {
 		injectedElement.value = JSON.stringify(state);
 	} else {
 		if (state.speed !== undefined) element.playbackRate = state.speed;
-		if (state.time !== undefined)
-			element.currentTime = determineTime(state);
 		if (state.paused !== undefined) {
-			if (state.paused) {
-				element.pause();
-			} else {
-				element.play();
-			}
+			var f = state.paused ? "pause" : "play";
+			element[f]().then(() => setTime(state, state.paused === false));
+		} else {
+			setTime(state, false);
 		}
 	}
+}
+
+function setTime(state, shouldFollowUp) {
+	if (state.time !== undefined) element.currentTime = determineTime(state);
+	if (shouldFollowUp) followUp(state, FOLLOW_UP_TICKS);
 }
 
 function sync(sendResponse, message) {
@@ -74,7 +95,9 @@ function sync(sendResponse, message) {
 	var peer = peers[key];
 	setStateHelper(peer);
 	var path = listenerRef.path.pieces_.concat(key).join("/");
-	setTimeout(() => listenToPeer(path), SYNC_DELAY);
+	setTimeout(() => {
+		listenToPeer(path);
+	}, SYNC_DELAY);
 	sendResponse(true);
 }
 
@@ -83,6 +106,7 @@ function listenToPeer(path) {
 	syncListener = db.ref(path);
 	syncListener.on("value", function (snapshot) {
 		var peer = snapshot.val();
+		var state = getState();
 		if (
 			!expected ||
 			isDifferent(expected, state, "me") ||
