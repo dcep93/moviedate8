@@ -7,7 +7,7 @@ var syncListener;
 var expected = null;
 
 const CHANGE_DIFF_CUTOFF = 0.5;
-const SYNC_DELAY = 1000;
+const SYNC_DELAY = 5000;
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 	console.log("receive", message.type, message);
@@ -83,42 +83,37 @@ function listenToPeer(path) {
 	syncListener = db.ref(path);
 	syncListener.on("value", function (snapshot) {
 		var peer = snapshot.val();
-		if (expected && expected !== peer) {
-			if (peer.duration === expected.duration) {
-				if (!hasManuallyChanged()) {
-					setStateHelper(peer);
-					return;
-				}
-			}
+		if (
+			!expected ||
+			isDifferent(expected, state, "me") ||
+			expected.duration !== peer.duration
+		)
+			return syncListener.off();
+		if (isDifferent(expected, peer, "peer")) {
+			setStateHelper(peer);
 		}
-		syncListener.off();
 	});
 }
 
-function hasManuallyChanged() {
-	if (expected === null) return true;
-	var me = getState();
-	var meTime = determineTime(me);
-	var expectedTime = determineTime(expected);
-	var diff = Math.abs(meTime - expectedTime);
+function isDifferent(a, b, tag) {
+	var aTime = determineTime(a);
+	var bTime = determineTime(b);
+	var diff = Math.abs(aTime - bTime);
 	if (diff > CHANGE_DIFF_CUTOFF) {
-		logManualChange("*time", meTime, expectedTime);
+		logDifferent(tag, "*time", aTime, bTime);
 		return true;
 	}
-	delete me.date;
-	delete me.time;
-	delete me.email;
-	delete me.duration;
-	for (var key in me) {
-		if (me[key] != expected[key]) {
-			logManualChange(key, me[key], expected[key]);
+	for (var key in a) {
+		if (key == "date" || key == "time" || key == "email") continue;
+		if (a[key] != b[key]) {
+			logDifferent(tag, key, a[key], b[key]);
 			return true;
 		}
 	}
 	return false;
 }
 
-function logManualChange(key, meKey, expectedKey) {
-	console.log(`manually changed ${key} ${meKey} ${expectedKey}`);
+function logDifferent(tag, key, meKey, expectedKey) {
+	console.log(`different ${tag} ${key} ${meKey} ${expectedKey}`);
 	expected = null;
 }
