@@ -7,23 +7,27 @@ var syncListener;
 var expected = null;
 
 const CHANGE_DIFF_CUTOFF = 0.05;
-const FOLLOW_UP_DIFF_CUTOFF = 0.001;
-const FOLLOW_UP_TICKS = 5;
-const FOLLOW_UP_TICK_DURATION = 1000;
+const FOLLOW_UP_TICKS = 10;
+const FOLLOW_UP_TICK_DURATION = 100;
+const FOLLOW_UP_MIN_PLAYBACK = 0.1;
+const FOLLOW_UP_MAX_PLAYBACK = 5;
 
 // todo
 function followUp(state, ticks) {
 	if (state.paused !== false) return;
-	var stateTime = determineTime(state);
-	var diff = stateTime - element.currentTime;
-	if (Math.abs(diff) < FOLLOW_UP_DIFF_CUTOFF) {
-		element.playbackRate = state.speed;
-		return;
-	}
-	var relative = diff / FOLLOW_UP_TICK_DURATION;
-	element.playbackRate += relative;
-	if (ticks) {
-		setTimeout(() => followUp(state, ticks - 1), FOLLOW_UP_TICK_DURATION);
+	if (ticks === undefined) ticks = FOLLOW_UP_TICKS;
+	if (ticks > 0) {
+		var stateTime = determineTime(state);
+		var diff = stateTime - element.currentTime;
+		var relative = diff / FOLLOW_UP_TICK_DURATION;
+		var newPlayback = element.playbackRate + relative;
+		newPlayback = Math.max(newPlayback, FOLLOW_UP_MIN_PLAYBACK);
+		newPlayback = Math.min(newPlayback, FOLLOW_UP_MAX_PLAYBACK);
+		// luckily this works for netflix too!
+		element.playbackRate = newPlayback;
+		return new Promise((resolve) => {
+			setTimeout(resolve, FOLLOW_UP_TICK_DURATION);
+		}).then(() => followUp(state, ticks - 1));
 	} else {
 		element.playbackRate = state.speed;
 	}
@@ -78,7 +82,7 @@ function setStateHelper(state) {
 function setStatePromise(state) {
 	if (inject !== null) {
 		injectedElement.value = JSON.stringify(state);
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve) => {
 			var interval = setInterval(() => {
 				if (injectedElement.value !== "") return;
 				clearInterval(interval);
