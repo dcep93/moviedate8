@@ -1,4 +1,4 @@
-var FREQUENCY = 420;
+var FREQUENCY = 1000;
 
 var emailDiv = document.getElementById("email");
 var speedInput = document.getElementById("speed");
@@ -87,7 +87,6 @@ function setPeers(peers, email, syncingStatus) {
 			continue;
 		}
 		if (tooOld(peer)) continue;
-
 		var id = btoa(key).replace(/=/g, "_");
 		var peerDiv = peersDiv.querySelector(`#${id}`);
 		if (!peerDiv) {
