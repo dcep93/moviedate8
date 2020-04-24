@@ -7,6 +7,8 @@ All users are required to have access to the video.
 
 ### To Install
 
+Movie Date is now available on the [web store](https://chrome.google.com/webstore/detail/movie-date/iofdkijmnaoabjndjbichhbllhbbkbde)
+
 1. Download [zip](https://github.com/dcep93/moviedate/releases) and unzip.
 2. Visit [chrome://extensions](chrome://extensions)
 3. Select "developer mode"
