@@ -6,30 +6,43 @@ var element;
 var syncListener;
 var expected = null;
 
-const CHANGE_DIFF_CUTOFF = 0.05;
+const CHANGE_DIFF_CUTOFF = 0.5;
 const FOLLOW_UP_TICKS = 10;
-const FOLLOW_UP_TICK_DURATION = 100;
-const FOLLOW_UP_MIN_PLAYBACK = 0.1;
-const FOLLOW_UP_MAX_PLAYBACK = 5;
+const FOLLOW_UP_TICK_DURATION = 1000;
+const FOLLOW_UP_MIN_PLAYBACK = 0.3;
+const FOLLOW_UP_MAX_PLAYBACK = 3;
+const FOLLOW_UP_CUTOFF = 0.001;
 
-// todo
-function followUp(state, ticks) {
+function followUp(state) {
 	if (state.paused !== false) return;
-	if (ticks === undefined) ticks = FOLLOW_UP_TICKS;
+	return Promise.resolve()
+		.then(() => followUpHelper(state, FOLLOW_UP_TICKS))
+		.then(() => {
+			element.playbackRate = state.speed;
+		});
+}
+
+function followUpHelper(state, ticks) {
 	if (ticks > 0) {
 		var stateTime = determineTime(state);
 		var diff = stateTime - element.currentTime;
-		var relative = diff / FOLLOW_UP_TICK_DURATION;
-		var newPlayback = element.playbackRate + relative;
-		newPlayback = Math.max(newPlayback, FOLLOW_UP_MIN_PLAYBACK);
-		newPlayback = Math.min(newPlayback, FOLLOW_UP_MAX_PLAYBACK);
-		// luckily this works for netflix too!
-		element.playbackRate = newPlayback;
-		return new Promise((resolve) => {
-			setTimeout(resolve, FOLLOW_UP_TICK_DURATION);
-		}).then(() => followUp(state, ticks - 1));
-	} else {
-		element.playbackRate = state.speed;
+		if (diff === 0 || Math.abs(diff) > FOLLOW_UP_CUTOFF) {
+			var relative = (1000 * diff) / FOLLOW_UP_TICK_DURATION;
+			var newPlayback = state.speed + relative;
+			if (newPlayback < FOLLOW_UP_MIN_PLAYBACK) {
+				if (relative < 0) return;
+				newPlayback = FOLLOW_UP_MIN_PLAYBACK;
+			} else if (newPlayback > FOLLOW_UP_MAX_PLAYBACK) {
+				if (relative > 0) return;
+				newPlayback = FOLLOW_UP_MAX_PLAYBACK;
+			}
+			console.log("diff", diff, newPlayback);
+			// luckily this works for netflix too!
+			element.playbackRate = newPlayback;
+			return new Promise((resolve) => {
+				setTimeout(resolve, FOLLOW_UP_TICK_DURATION);
+			}).then(() => followUpHelper(state, ticks - 1));
+		}
 	}
 }
 
@@ -64,6 +77,8 @@ function init(sendResponse, message) {
 }
 
 function query(sendResponse) {
+	// not ready yet
+	if (peers === undefined) return sendResponse(undefined);
 	sendResponse({ email, peers });
 }
 

@@ -17,7 +17,7 @@ window.onload = () => {
 function queryTab() {
 	if (tabId === undefined) return;
 	chrome.tabs.sendMessage(tabId, { type: "query" }, function (response) {
-		if (response === undefined) {
+		if (response === null || response === undefined) {
 			allowNonValidPage();
 		} else if (response.email !== undefined) {
 			setPopupState(response);
