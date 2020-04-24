@@ -6,13 +6,14 @@ var element;
 var syncListener;
 var expected = null;
 
-const CHANGE_DIFF_CUTOFF = 0.5;
-const SYNC_DELAY = 5000;
+const CHANGE_DIFF_CUTOFF = 0.05;
 const FOLLOW_UP_DIFF_CUTOFF = 0.001;
 const FOLLOW_UP_TICKS = 5;
 const FOLLOW_UP_TICK_DURATION = 1000;
 
+// todo
 function followUp(state, ticks) {
+	if (state.paused !== false) return;
 	var stateTime = determineTime(state);
 	var diff = stateTime - element.currentTime;
 	if (Math.abs(diff) < FOLLOW_UP_DIFF_CUTOFF) {
@@ -71,33 +72,40 @@ function setState(sendResponse, message) {
 function setStateHelper(state) {
 	console.log("setting state", state);
 	expected = state;
-	if (inject !== null) {
-		injectedElement.value = JSON.stringify(state);
-	} else {
-		if (state.speed !== undefined) element.playbackRate = state.speed;
-		if (state.paused !== undefined) {
-			var f = state.paused ? "pause" : "play";
-			element[f]().then(() => setTime(state, state.paused === false));
-		} else {
-			setTime(state, false);
-		}
-	}
+	return setStatePromise(state).then(followUp);
 }
 
-function setTime(state, shouldFollowUp) {
-	if (state.time !== undefined) element.currentTime = determineTime(state);
-	if (shouldFollowUp) followUp(state, FOLLOW_UP_TICKS);
+function setStatePromise(state) {
+	if (inject !== null) {
+		injectedElement.value = JSON.stringify(state);
+		return new Promise((resolve, reject) => {
+			var interval = setInterval(() => {
+				if (injectedElement.value !== "") return;
+				clearInterval(interval);
+				resolve(state);
+			});
+		});
+	} else {
+		if (state.speed !== undefined) element.playbackRate = state.speed;
+		if (state.time !== undefined)
+			element.currentTime = determineTime(state);
+		if (state.paused !== undefined) {
+			var f = state.paused ? "pause" : "play";
+			return element[f]().then(() => state);
+		} else {
+			return Promise.resolve(state);
+		}
+	}
 }
 
 function sync(sendResponse, message) {
 	if (syncListener !== undefined) syncListener.off();
 	var key = message.key;
 	var peer = peers[key];
-	setStateHelper(peer);
 	var path = listenerRef.path.pieces_.concat(key).join("/");
-	setTimeout(() => {
+	setStateHelper(peer).then(() => {
 		listenToPeer(path);
-	}, SYNC_DELAY);
+	});
 	sendResponse(true);
 }
 

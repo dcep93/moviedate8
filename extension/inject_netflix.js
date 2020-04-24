@@ -17,7 +17,7 @@
 		var timeMS = timeS * 1000;
 		player.pause();
 		if (!state.paused) {
-			timeMS += TIME_DELAY_MS;
+			timeMS += TIME_DELAY_MS * (state.speed || 1);
 			setTimeout(player.play, TIME_DELAY_MS);
 		}
 		player.seek(timeMS);
