@@ -83,10 +83,12 @@ function listenToPeer(path) {
 	syncListener = db.ref(path);
 	syncListener.on("value", function (snapshot) {
 		var peer = snapshot.val();
-		if (expected && peer.duration === expected.duration) {
-			if (!hasManuallyChanged()) {
-				setStateHelper(peer);
-				return;
+		if (expected && expected !== peer) {
+			if (peer.duration === expected.duration) {
+				if (!hasManuallyChanged()) {
+					setStateHelper(peer);
+					return;
+				}
 			}
 		}
 		syncListener.off();

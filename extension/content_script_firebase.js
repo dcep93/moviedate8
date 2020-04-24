@@ -29,6 +29,7 @@ function getState() {
 
 function reportState() {
 	var args = getState();
+	if (isNaN(args.duration)) return console.log(args);
 	postToFirebase(args);
 }
 
