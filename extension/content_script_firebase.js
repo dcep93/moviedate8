@@ -16,15 +16,19 @@ function beginReporting() {
 	setInterval(reportState, FREQUENCY);
 }
 
-function reportState() {
+function getState() {
 	var rawId = `${window.location.host || "local"}`;
 	var id = rawId.replace(/\./g, "_");
 	var speed = element.playbackRate;
 	var time = element.currentTime;
 	var paused = element.paused;
+	var duration = element.duration;
 	var date = Date.now();
-	var args = { id, email, speed, time, paused, date };
+	return { id, email, speed, time, paused, duration, date };
+}
 
+function reportState() {
+	var args = getState();
 	postToFirebase(args);
 }
 
