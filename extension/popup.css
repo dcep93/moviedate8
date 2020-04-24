@@ -31,3 +31,11 @@
 .paused {
 	background-color: lightgray;
 }
+
+.synced {
+	background-color: lightgreen;
+}
+
+.syncing {
+	background-color: yellow;
+}

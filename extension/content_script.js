@@ -1,5 +1,6 @@
 var email;
 var peers;
+var syncingStatus = {};
 
 var element;
 
@@ -7,7 +8,7 @@ var syncListener;
 var expected = null;
 
 const CHANGE_DIFF_CUTOFF = 0.5;
-const FOLLOW_UP_TICKS = 10;
+const FOLLOW_UP_TICKS = 5;
 const FOLLOW_UP_TICK_DURATION = 1000;
 const FOLLOW_UP_MIN_PLAYBACK = 0.3;
 const FOLLOW_UP_MAX_PLAYBACK = 3;
@@ -79,7 +80,7 @@ function init(sendResponse, message) {
 function query(sendResponse) {
 	// not ready yet
 	if (peers === undefined) return sendResponse(undefined);
-	sendResponse({ email, peers });
+	sendResponse({ email, peers, syncingStatus });
 }
 
 function setState(sendResponse, message) {
@@ -122,15 +123,15 @@ function sync(sendResponse, message) {
 	var key = message.key;
 	var peer = peers[key];
 	var path = listenerRef.path.pieces_.concat(key).join("/");
-	setStateHelper(peer).then(() => {
-		listenToPeer(path);
-	});
+	syncingStatus = { target: key, status: false };
+	setStateHelper(peer).then(() => listenToPeer(path));
 	sendResponse(true);
 }
 
 function listenToPeer(path) {
 	if (syncListener !== undefined) syncListener.off();
 	syncListener = db.ref(path);
+	syncingStatus.status = true;
 	syncListener.on("value", function (snapshot) {
 		var peer = snapshot.val();
 		var state = getState();
@@ -138,8 +139,10 @@ function listenToPeer(path) {
 			!expected ||
 			isDifferent(expected, state, "me") ||
 			expected.duration !== peer.duration
-		)
+		) {
+			syncingStatus = {};
 			return syncListener.off();
+		}
 		if (isDifferent(expected, peer, "peer")) {
 			setStateHelper(peer);
 		}

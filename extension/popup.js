@@ -63,7 +63,7 @@ function sync(key) {
 form.onsubmit = submitForm;
 
 function setPopupState(state) {
-	setPeers(state.peers, state.email);
+	setPeers(state.peers, state.email, state.syncingStatus);
 }
 
 function setSelfState(self) {
@@ -77,7 +77,7 @@ function setSelfState(self) {
 peersDiv.removeChild(peerTemplate);
 peerTemplate.hidden = false;
 peerTemplate.removeAttribute("id");
-function setPeers(peers, email) {
+function setPeers(peers, email, syncingStatus) {
 	var keys = Object.keys(peers);
 	for (var i = 0; i < keys.length; i++) {
 		let key = keys[i];
@@ -87,7 +87,8 @@ function setPeers(peers, email) {
 			continue;
 		}
 		if (tooOld(peer)) continue;
-		var id = `peer-${key}`.replace(/@/g, "_").replace(/\?/g, "_");
+
+		var id = btoa(key).replace(/=/g, "_");
 		var peerDiv = peersDiv.querySelector(`#${id}`);
 		if (!peerDiv) {
 			peerDiv = peerTemplate.cloneNode(true);
@@ -97,6 +98,18 @@ function setPeers(peers, email) {
 			};
 			peerDiv.setAttribute("id", id);
 			peersDiv.appendChild(peerDiv);
+		}
+		if (key === syncingStatus.target) {
+			if (syncingStatus.status) {
+				peerDiv.classList.add("synced");
+				peerDiv.classList.remove("syncing");
+			} else {
+				peerDiv.classList.add("syncing");
+				peerDiv.classList.remove("synced");
+			}
+		} else {
+			peerDiv.classList.remove("syncing");
+			peerDiv.classList.remove("synced");
 		}
 		peerDiv.querySelector(".peer_speed").innerText = peer.speed.toFixed(2);
 		peerDiv.querySelector(".peer_time").innerText = determineTime(
