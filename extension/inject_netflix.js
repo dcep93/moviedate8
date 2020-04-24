@@ -14,7 +14,7 @@
 
 	function setTime(state) {
 		var timeS = determineTime(state);
-		timeS += NETFLIX_OFFSET;
+		if (state.paused === false) timeS += NETFLIX_OFFSET;
 		var timeMS = timeS * 1000;
 		player.seek(timeMS);
 	}

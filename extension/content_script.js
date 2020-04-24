@@ -6,6 +6,7 @@ var element;
 var syncListener;
 var expected = null;
 
+const CHANGE_DIFF_CUTOFF = 0.5;
 const SYNC_DELAY = 1000;
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
@@ -44,11 +45,13 @@ function query(sendResponse) {
 
 function setState(sendResponse, message) {
 	setStateHelper(message.state);
+	expected = null;
 	sendResponse(true);
 }
 
 function setStateHelper(state) {
 	console.log("setting state", state);
+	expected = state;
 	if (inject !== null) {
 		injectedElement.value = JSON.stringify(state);
 	} else {
@@ -70,7 +73,6 @@ function sync(sendResponse, message) {
 	var key = message.key;
 	var peer = peers[key];
 	setStateHelper(peer);
-	expected = peer;
 	var path = listenerRef.path.pieces_.concat(key).join("/");
 	setTimeout(() => listenToPeer(path), SYNC_DELAY);
 	sendResponse(true);
@@ -81,11 +83,12 @@ function listenToPeer(path) {
 	syncListener = db.ref(path);
 	syncListener.on("value", function (snapshot) {
 		if (hasManuallyChanged()) return syncListener.off();
-		setStateHelper(snapshot);
+		setStateHelper(snapshot.val());
 	});
 }
 
 function hasManuallyChanged() {
+	if (expected === null) return true;
 	var me = getState();
 	delete me.email;
 	var meTime = determineTime(me);
@@ -93,6 +96,7 @@ function hasManuallyChanged() {
 	var diff = Math.abs(meTime - expectedTime);
 	if (diff > CHANGE_DIFF_CUTOFF) {
 		logManualChange("*time", meTime, expectedTime);
+		return true;
 	}
 	delete me.date;
 	delete me.time;
