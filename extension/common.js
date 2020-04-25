@@ -6,7 +6,7 @@ chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
 	var tabId_ = tabs[0].id;
 
 	chrome.identity.getProfileUserInfo(function (info) {
-		var email = `${info.email || "?"}(${tabId_})`;
+		var email = `${info.email || "?"}_${tabId_}`;
 		chrome.tabs.sendMessage(
 			tabId_,
 			{ type: "init", tabId: tabId_, email },
