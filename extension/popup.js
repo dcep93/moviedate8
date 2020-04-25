@@ -9,10 +9,10 @@ var form = document.getElementById("form");
 var peerTemplate = document.getElementById("peer_template");
 var peersDiv = peerTemplate.parentElement;
 
-window.onload = () => {
+function init() {
 	queryTab();
 	setInterval(queryTab, FREQUENCY);
-};
+}
 
 function queryTab() {
 	if (tabId === undefined) return;
@@ -63,7 +63,7 @@ function sync(key) {
 form.onsubmit = submitForm;
 
 function setPopupState(state) {
-	setPeers(state.peers, state.email, state.syncingStatus);
+	setPeers(state.peers, state.email);
 }
 
 function setSelfState(self) {
@@ -77,8 +77,10 @@ function setSelfState(self) {
 peersDiv.removeChild(peerTemplate);
 peerTemplate.hidden = false;
 peerTemplate.removeAttribute("id");
-function setPeers(peers, email, syncingStatus) {
+function setPeers(peers, email) {
 	var keys = Object.keys(peers);
+	var myKey = keys.filter((key) => peers[key].email === email);
+	var syncingStatus = peers[myKey].syncingStatus;
 	for (var i = 0; i < keys.length; i++) {
 		let key = keys[i];
 		var peer = peers[key];
@@ -98,7 +100,12 @@ function setPeers(peers, email, syncingStatus) {
 			peerDiv.setAttribute("id", id);
 			peersDiv.appendChild(peerDiv);
 		}
-		if (key === syncingStatus.target) {
+		if (peer.syncingStatus && peer.syncingStatus.target == myKey) {
+			peerDiv.setAttribute("sync_follow", peer.syncingStatus.status);
+		} else {
+			peerDiv.removeAttribute("sync_follow");
+		}
+		if (syncingStatus && syncingStatus.target === key) {
 			peerDiv.setAttribute("sync", syncingStatus.status);
 		} else {
 			peerDiv.removeAttribute("sync");

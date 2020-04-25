@@ -32,14 +32,18 @@
 	background-color: lightgray;
 }
 
-[sync="true"] {
+[sync_follow="synced"] {
+	background-color: lightblue;
+}
+
+[sync="syncing"] {
+	background-color: yellow;
+}
+
+[sync="synced"] {
 	background-color: lightgreen;
 }
 
-[sync="false"] {
+[sync="failed"] {
 	background-color: red;
-}
-
-[sync="null"] {
-	background-color: yellow;
 }

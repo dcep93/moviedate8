@@ -24,7 +24,7 @@ function getState() {
 	var paused = element.paused;
 	var duration = element.duration;
 	var date = Date.now();
-	return { id, email, speed, time, paused, duration, date };
+	return { id, email, speed, time, paused, duration, date, syncingStatus };
 }
 
 function reportState() {

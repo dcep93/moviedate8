@@ -13,6 +13,7 @@ chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
 			(response) => {
 				if (response === true) {
 					tabId = tabId_;
+					init();
 					// // send message to background
 					// chrome.runtime.sendMessage({ tabId });
 				} else if (response === undefined) {

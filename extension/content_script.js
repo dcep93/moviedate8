@@ -14,6 +14,11 @@ const FOLLOW_UP_MIN_PLAYBACK = 0.3;
 const FOLLOW_UP_MAX_PLAYBACK = 3;
 const FOLLOW_UP_CUTOFF = 0.001;
 
+var SYNC_FOLLOWED = "followed";
+var SYNC_SYNCING = "syncing";
+var SYNC_SYNCED = "synced";
+var SYNC_FAILED = "failed";
+
 function followUp(state) {
 	console.log("followUp");
 	if (state.paused !== false) return;
@@ -100,7 +105,7 @@ function init(sendResponse, message) {
 function query(sendResponse) {
 	// not ready yet
 	if (peers === undefined) return sendResponse(undefined);
-	sendResponse({ email, peers, syncingStatus });
+	sendResponse({ email, peers });
 }
 
 function setState(sendResponse, message) {
@@ -143,11 +148,11 @@ function sync(sendResponse, message) {
 	var key = message.key;
 	var peer = peers[key];
 	var path = listenerRef.path.pieces_.concat(key).join("/");
-	syncingStatus = { target: key, status: null };
+	syncingStatus = { target: key, status: SYNC_SYNCING };
 	setStateHelper(peer)
 		.then(() => listenToPeer(path))
 		.catch((err) => {
-			syncingStatus.status = false;
+			syncingStatus.status = SYNC_FAILED;
 			console.log(err);
 		});
 	sendResponse(true);
@@ -156,7 +161,7 @@ function sync(sendResponse, message) {
 function listenToPeer(path) {
 	if (syncListener !== undefined) syncListener.off();
 	syncListener = db.ref(path);
-	syncingStatus.status = true;
+	syncingStatus.status = SYNC_SYNCED;
 	syncListener.on("value", function (snapshot) {
 		var peer = snapshot.val();
 		var state = getState();
