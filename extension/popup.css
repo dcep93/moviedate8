@@ -32,10 +32,14 @@
 	background-color: lightgray;
 }
 
-.synced {
+[sync="true"] {
 	background-color: lightgreen;
 }
 
-.syncing {
+[sync="false"] {
+	background-color: red;
+}
+
+[sync="null"] {
 	background-color: yellow;
 }

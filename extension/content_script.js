@@ -15,12 +15,33 @@ const FOLLOW_UP_MAX_PLAYBACK = 3;
 const FOLLOW_UP_CUTOFF = 0.001;
 
 function followUp(state) {
+	console.log("followUp");
 	if (state.paused !== false) return;
-	return Promise.resolve()
+	return ensurePlaying(state)
 		.then(() => followUpHelper(state, FOLLOW_UP_TICKS))
 		.then(() => {
 			element.playbackRate = state.speed;
 		});
+}
+
+function ensurePlaying(state) {
+	var previous;
+	return new Promise((resolve, reject) => {
+		function helper(ticks) {
+			var next = { time: Date.now(), currentTime: element.currentTime };
+			if (previous !== undefined) {
+				var elapsed = next.time - previous.time;
+				var seeked = next.currentTime - previous.currentTime;
+				var expected = (elapsed * (state.speed || 1)) / 1000;
+				var diff = seeked - expected;
+				if (Math.abs(diff) < FOLLOW_UP_CUTOFF) return resolve();
+			}
+			previous = next;
+			if (ticks === 0) return reject("could not ensure playing");
+			setTimeout(() => helper(ticks - 1), FOLLOW_UP_TICK_DURATION);
+		}
+		helper(FOLLOW_UP_TICKS);
+	});
 }
 
 function followUpHelper(state, ticks) {
@@ -37,7 +58,6 @@ function followUpHelper(state, ticks) {
 				if (relative > 0) return;
 				newPlayback = FOLLOW_UP_MAX_PLAYBACK;
 			}
-			console.log("diff", diff, newPlayback);
 			// luckily this works for netflix too!
 			element.playbackRate = newPlayback;
 			return new Promise((resolve) => {
@@ -123,8 +143,13 @@ function sync(sendResponse, message) {
 	var key = message.key;
 	var peer = peers[key];
 	var path = listenerRef.path.pieces_.concat(key).join("/");
-	syncingStatus = { target: key, status: false };
-	setStateHelper(peer).then(() => listenToPeer(path));
+	syncingStatus = { target: key, status: null };
+	setStateHelper(peer)
+		.then(() => listenToPeer(path))
+		.catch((err) => {
+			syncingStatus.status = false;
+			console.log(err);
+		});
 	sendResponse(true);
 }
 
@@ -140,6 +165,7 @@ function listenToPeer(path) {
 			isDifferent(expected, state, "me") ||
 			expected.duration !== peer.duration
 		) {
+			console.log("clearing");
 			syncingStatus = {};
 			return syncListener.off();
 		}
@@ -157,8 +183,7 @@ function isDifferent(a, b, tag) {
 		logDifferent(tag, "*time", aTime, bTime);
 		return true;
 	}
-	for (var key in a) {
-		if (key == "date" || key == "time" || key == "email") continue;
+	for (var key of ["speed", "paused"]) {
 		if (a[key] != b[key]) {
 			logDifferent(tag, key, a[key], b[key]);
 			return true;

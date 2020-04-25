@@ -99,16 +99,9 @@ function setPeers(peers, email, syncingStatus) {
 			peersDiv.appendChild(peerDiv);
 		}
 		if (key === syncingStatus.target) {
-			if (syncingStatus.status) {
-				peerDiv.classList.add("synced");
-				peerDiv.classList.remove("syncing");
-			} else {
-				peerDiv.classList.add("syncing");
-				peerDiv.classList.remove("synced");
-			}
+			peerDiv.setAttribute("sync", syncingStatus.status);
 		} else {
-			peerDiv.classList.remove("syncing");
-			peerDiv.classList.remove("synced");
+			peerDiv.removeAttribute("sync");
 		}
 		peerDiv.querySelector(".peer_speed").innerText = peer.speed.toFixed(2);
 		peerDiv.querySelector(".peer_time").innerText = determineTime(
