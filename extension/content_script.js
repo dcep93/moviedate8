@@ -18,6 +18,7 @@ var SYNC_FOLLOWED = "followed";
 var SYNC_SYNCING = "syncing";
 var SYNC_SYNCED = "synced";
 var SYNC_FAILED = "failed";
+var SYNC_CLEARED = "cleared";
 
 function followUp(state) {
 	console.log("followUp");
@@ -171,7 +172,7 @@ function listenToPeer(path) {
 			expected.duration !== peer.duration
 		) {
 			console.log("clearing");
-			syncingStatus = {};
+			syncingStatus.state = SYNC_CLEARED;
 			return syncListener.off();
 		}
 		if (isDifferent(expected, peer, "peer")) {

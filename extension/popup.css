@@ -47,3 +47,7 @@
 [sync="failed"] {
 	background-color: red;
 }
+
+[sync="cleared"] {
+	background-color: purple;
+}

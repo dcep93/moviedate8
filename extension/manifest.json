@@ -1,7 +1,7 @@
 {
 	"name": "Movie Date",
 	"description": "Syncs videos for people watching the same video at the same time.",
-	"version": "3.1.0",
+	"version": "3.1.1",
 	"icons": {
 		"16": "moviedate.png",
 		"48": "moviedate.png",
@@ -13,6 +13,8 @@
 				"https://www.dropbox.com/*",
 				"https://www.youtube.com/*",
 				"https://www.netflix.com/*",
+				"http://www.vh1.com/*",
+				"https://www.vh1.com/*",
 				"file:///*"
 			],
 			"js": [
