@@ -1,6 +1,6 @@
 // https://console.firebase.google.com/u/0/project/moviedatesync/database/moviedatesync/data
 
-const VERSION = "v3.1.2";
+const VERSION = "v4.0.0";
 
 var PREFIX = "data";
 var FREQUENCY = 1000;
