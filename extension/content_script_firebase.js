@@ -9,6 +9,7 @@ var db;
 var listenerRef;
 
 function beginReporting() {
+	if (db !== undefined) return;
 	var config = {
 		databaseURL: "https://moviedatesync.firebaseio.com",
 	};
@@ -16,6 +17,17 @@ function beginReporting() {
 	db = firebase.database();
 	reportState();
 	setInterval(reportState, FREQUENCY);
+}
+
+function setDateOffset() {
+	var path = ".info/serverTimeOffset";
+	return db
+		.ref(path)
+		.once("value")
+		.then(function (data) {
+			dateOffset = data.val();
+			return dateOffset;
+		});
 }
 
 function getState() {

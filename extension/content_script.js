@@ -82,7 +82,8 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 		console.log("send", response) || sendResponse(response);
 	switch (message.type) {
 		case "init":
-			return init(respond, message);
+			init(respond, message);
+			return false;
 		case "query":
 			query(respond, message);
 			break;
@@ -102,8 +103,11 @@ function init(sendResponse, message) {
 	if (element === undefined || isNaN(element.duration))
 		return sendResponse("no video found");
 	email = message.email;
-	if (db === undefined) beginReporting();
-	return handleInject(sendResponse);
+	Promise.resolve()
+		.then(beginReporting)
+		.then(handleInject)
+		.then(setDateOffset)
+		.then(sendResponse);
 }
 
 function query(sendResponse) {
