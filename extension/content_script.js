@@ -7,6 +7,8 @@ var element;
 var syncListener;
 var expected = null;
 
+var SET_STATE_TIME_DIFF_CUTOFF = 1;
+
 const CHANGE_DIFF_CUTOFF = 0.5;
 const FOLLOW_UP_TICKS = 5;
 const FOLLOW_UP_TICK_DURATION = 1000;
@@ -129,6 +131,8 @@ function setStateHelper(state) {
 }
 
 function setStatePromise(state) {
+	var diff = Math.abs(determineTime(state) - element.currentTime);
+	if (diff < SET_STATE_TIME_DIFF_CUTOFF) delete state.time;
 	if (inject !== null) {
 		var injectState = Object.assign({}, state, {
 			myDateOffset: dateOffset,
