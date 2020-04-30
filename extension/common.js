@@ -11,18 +11,18 @@ chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
 			tabId_,
 			{ type: "init", tabId: tabId_, email },
 			(response) => {
-				if (response === true) {
-					tabId = tabId_;
-					init();
-					// // send message to background
-					// chrome.runtime.sendMessage({ tabId });
+				if (typeof response === "string") {
+					window.close();
+					return alert(response);
 				} else if (response === undefined) {
 					allowNonValidPage();
 					window.close();
 					return alert("cannot run on this page");
 				} else {
-					window.close();
-					return alert(response);
+					tabId = tabId_;
+					init(response);
+					// // send message to background
+					// chrome.runtime.sendMessage({ tabId });
 				}
 			}
 		);

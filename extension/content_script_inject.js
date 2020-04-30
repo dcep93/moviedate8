@@ -4,12 +4,14 @@ var inject;
 var injectedElement;
 
 function handleInject(sendResponse) {
+	// todo
+	dateOffset = 0;
 	if (inject === undefined) {
 		if (window.location.host === "www.netflix.com") {
 			inject = "netflix";
 		} else {
 			inject = null;
-			sendResponse(true);
+			sendResponse(dateOffset);
 			return false;
 		}
 		const url = chrome.runtime.getURL(`inject_${inject}.js`);
@@ -26,11 +28,11 @@ function handleInject(sendResponse) {
 			);
 		return true;
 	} else {
-		sendResponse(true);
+		sendResponse(dateOffset);
 	}
 }
 
 function setInjectedElement(sendResponse) {
 	injectedElement = document.getElementById(INJECTED_ELEMENT_ID);
-	sendResponse(true);
+	sendResponse(dateOffset);
 }

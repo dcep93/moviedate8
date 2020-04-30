@@ -1,6 +1,6 @@
 // https://console.firebase.google.com/u/0/project/moviedatesync/database/moviedatesync/data
 
-const VERSION = 'v3.1.2';
+const VERSION = "v3.1.2";
 
 var PREFIX = "data";
 var FREQUENCY = 1000;
@@ -25,9 +25,21 @@ function getState() {
 	var time = element.currentTime;
 	var paused = element.paused;
 	var duration = element.duration;
-	var date = Date.now();
+	var date = getCurrentTime();
 	var url = window.location.href;
-	return { id, email, speed, time, paused, duration, date, url, syncingStatus, version: VERSION };
+	return {
+		id,
+		email,
+		speed,
+		time,
+		paused,
+		duration,
+		date,
+		dateOffset,
+		url,
+		syncingStatus,
+		version: VERSION,
+	};
 }
 
 function reportState() {

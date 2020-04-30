@@ -9,7 +9,8 @@ var form = document.getElementById("form");
 var peerTemplate = document.getElementById("peer_template");
 var peersDiv = peerTemplate.parentElement;
 
-function init() {
+function init(response) {
+	dateOffset = response;
 	queryTab();
 	setInterval(queryTab, FREQUENCY);
 }
@@ -31,7 +32,7 @@ function queryTab() {
 
 function submitForm() {
 	if (tabId === undefined) return alert("script not loaded");
-	var date = Date.now();
+	var date = getCurrentTime();
 	var state = { date };
 	if (document.activeElement === speedInput) state.speed = speedInput.value;
 	if (document.activeElement === timeInput) state.time = timeInput.value;
@@ -123,7 +124,7 @@ function setPeers(peers, email) {
 }
 
 function tooOld(peer) {
-	var ageMs = Date.now() - peer.date;
+	var ageMs = getCurrentTime() - peer.date;
 	var oneMinute = 1000 * 60;
 	return ageMs > oneMinute;
 }

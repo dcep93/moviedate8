@@ -34,7 +34,10 @@ function ensurePlaying(state) {
 	var previous;
 	return new Promise((resolve, reject) => {
 		function helper(ticks) {
-			var next = { time: Date.now(), currentTime: element.currentTime };
+			var next = {
+				time: getCurrentTime(),
+				currentTime: element.currentTime,
+			};
 			if (previous !== undefined) {
 				var elapsed = next.time - previous.time;
 				var seeked = next.currentTime - previous.currentTime;
@@ -123,7 +126,10 @@ function setStateHelper(state) {
 
 function setStatePromise(state) {
 	if (inject !== null) {
-		injectedElement.value = JSON.stringify(state);
+		var injectState = Object.assign({}, state, {
+			myDateOffset: dateOffset,
+		});
+		injectedElement.value = JSON.stringify(injectState);
 		return new Promise((resolve) => {
 			var interval = setInterval(() => {
 				if (injectedElement.value !== "") return;
