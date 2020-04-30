@@ -7,26 +7,33 @@ var FREQUENCY = 1000;
 
 var db;
 var listenerRef;
+var reportInverval;
+
+function getDb() {
+	if (db === undefined) {
+		var config = {
+			databaseURL: "https://moviedatesync.firebaseio.com",
+		};
+		firebase.initializeApp(config);
+		db = firebase.database();
+	}
+	return db;
+}
 
 function beginReporting() {
-	if (db !== undefined) return;
-	var config = {
-		databaseURL: "https://moviedatesync.firebaseio.com",
-	};
-	firebase.initializeApp(config);
-	db = firebase.database();
+	if (reportInverval !== undefined) return;
+	getDb();
 	reportState();
-	setInterval(reportState, FREQUENCY);
+	reportInverval = setInterval(reportState, FREQUENCY);
 }
 
 function setDateOffset() {
 	var path = ".info/serverTimeOffset";
-	return db
+	return getDb()
 		.ref(path)
 		.once("value")
 		.then(function (data) {
 			dateOffset = data.val();
-			return dateOffset;
 		});
 }
 
