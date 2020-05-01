@@ -17,7 +17,9 @@ chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
 				} else if (response === undefined) {
 					allowNonValidPage();
 					window.close();
-					return alert("cannot run on this page");
+					return alert(
+						"cannot run on this page\nIf this is a local file, be sure to enable 'Allow access to file URLs' for moviedate"
+					);
 				} else {
 					tabId = tabId_;
 					init(response);
