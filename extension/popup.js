@@ -89,7 +89,7 @@ function setPeers(peers, email) {
 			setSelfState(peer);
 			continue;
 		}
-		// if (tooOld(peer)) continue;
+		if (tooOld(peer)) continue;
 		var id = btoa(key).replace(/=/g, "_");
 		var peerDiv = peersDiv.querySelector(`#${id}`);
 		if (!peerDiv) {
