@@ -22,6 +22,8 @@ var SYNC_SYNCED = "synced";
 var SYNC_FAILED = "failed";
 var SYNC_CLEARED = "cleared";
 
+console.log("moviedate start");
+
 function followUp(state) {
 	console.log("followUp");
 	if (state.paused !== false) return;
@@ -45,7 +47,7 @@ function ensurePlaying(state) {
 				var seeked = next.currentTime - previous.currentTime;
 				var expected = (elapsed * (state.speed || 1)) / 1000;
 				var diff = seeked - expected;
-				if (Math.abs(diff) < FOLLOW_UP_CUTOFF) return resolve();
+				if (Math.abs(diff) < CHANGE_DIFF_CUTOFF) return resolve();
 			}
 			previous = next;
 			if (ticks === 0) return reject("could not ensure playing");
@@ -79,9 +81,10 @@ function followUpHelper(state, ticks) {
 }
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-	console.log("receive", message.type, message);
-	var respond = (response) =>
-		console.log("send", response) || sendResponse(response);
+	// console.log("receive", message.type, message);
+	// var respond = (response) =>
+	// 	console.log("send", response) || sendResponse(response);
+	var respond = sendResponse;
 	switch (message.type) {
 		case "init":
 			init(respond, message);
@@ -151,7 +154,9 @@ function setStatePromise(state) {
 			element.currentTime = determineTime(state);
 		if (state.paused !== undefined) {
 			var f = state.paused ? "pause" : "play";
-			return element[f]().then(() => state);
+			return Promise.resolve()
+				.then(() => element[f]())
+				.then(() => state);
 		} else {
 			return Promise.resolve(state);
 		}
