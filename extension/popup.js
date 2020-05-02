@@ -3,14 +3,16 @@ var FREQUENCY = 1000;
 var emailDiv = document.getElementById("email");
 var speedInput = document.getElementById("speed");
 var timeInput = document.getElementById("time");
+var versionDiv = document.getElementById("version");
+var advancedDiv = document.getElementById("advanced");
+var offsetInput = document.getElementById("dateOffset");
 
 var form = document.getElementById("form");
 
 var peerTemplate = document.getElementById("peer_template");
 var peersDiv = peerTemplate.parentElement;
 
-function init(response) {
-	dateOffset = response;
+function init() {
 	queryTab();
 	setInterval(queryTab, FREQUENCY);
 }
@@ -34,8 +36,8 @@ function submitForm() {
 	if (tabId === undefined) return alert("script not loaded");
 	var date = getCurrentTime();
 	var state = { date };
-	if (document.activeElement === speedInput) state.speed = speedInput.value;
-	if (document.activeElement === timeInput) state.time = timeInput.value;
+	if (!document.activeElement) return alert("no active element?");
+	state[document.activeElement.name] = document.activeElement.value;
 	chrome.tabs.sendMessage(
 		tabId,
 		{ type: "set_state", state },
@@ -63,11 +65,15 @@ function setPopupState(state) {
 }
 
 function setSelfState(self) {
+	dateOffset = self.dateOffset;
 	emailDiv.innerText = self.email;
-	if (document.activeElement !== speedInput)
-		speedInput.value = self.speed.toFixed(2);
-	if (document.activeElement !== timeInput)
-		timeInput.value = determineTime(self).toFixed(2);
+	setInput(speedInput, self.speed.toFixed(2));
+	setInput(timeInput, determineTime(self).toFixed(2));
+	setInput(offsetInput, self.dateOffset);
+}
+
+function setInput(element, value) {
+	if (document.activeElement !== element) element.value = value;
 }
 
 function tooOld(peer) {
@@ -119,6 +125,8 @@ function setPeers(peers, email) {
 		}
 	}
 }
+
+versionDiv.onclick = () => (advancedDiv.hidden = false);
 
 form.onsubmit = submitForm;
 

@@ -1,4 +1,4 @@
-const VERSION = "v4.0.0";
+const VERSION = "v4.1.0";
 
 var email;
 var peers;
@@ -30,7 +30,7 @@ const SYNC_CLEARED = "cleared";
 
 //
 
-console.log("moviedate start");
+console.log("moviedate start", VERSION);
 
 function getState() {
 	var rawId = `${window.location.host || "local"}`;
@@ -98,7 +98,7 @@ function init(sendResponse, message) {
 		return sendResponse("no video found");
 	email = message.email;
 	Promise.resolve()
-		.then(setDateOffset)
+		.then(dateOffset === undefined && setDateOffset)
 		.then(beginReporting)
 		.then(handleInject)
 		.then(() => dateOffset)
@@ -112,6 +112,8 @@ function query(sendResponse) {
 }
 
 function setState(sendResponse, message) {
+	if (message.state.dateOffset)
+		dateOffset = parseFloat(message.state.dateOffset);
 	setStateHelper(message.state);
 	expected = null;
 	sendResponse(true);
@@ -181,7 +183,7 @@ function listenToPeer(path) {
 			expected.duration !== peer.duration
 		) {
 			console.log("clearing");
-			syncingStatus.state = SYNC_CLEARED;
+			syncingStatus.status = SYNC_CLEARED;
 			return syncListener.off();
 		}
 		if (isDifferent(expected, peer, "peer")) {

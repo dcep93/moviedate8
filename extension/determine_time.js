@@ -8,5 +8,5 @@ function determineTime(state) {
 }
 
 function getCurrentTime() {
-	return Date.now() + dateOffset;
+	return Date.now() + (dateOffset || 0);
 }
