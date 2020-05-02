@@ -115,14 +115,14 @@ function setState(sendResponse, message) {
 	if (message.state.dateOffset)
 		dateOffset = parseFloat(message.state.dateOffset);
 	setStateHelper(message.state);
-	expected = null;
 	sendResponse(true);
 }
 
 function setStateHelper(state) {
 	console.log("setting state", state);
-	expected = state;
-	return setStatePromise(state).then(followUp);
+	return setStatePromise(state)
+		.then(followUp)
+		.then(() => (expected = getState()));
 }
 
 function setStatePromise(state) {
@@ -235,8 +235,8 @@ function ensurePlaying(state) {
 			if (previous !== undefined) {
 				var elapsed = next.time - previous.time;
 				var seeked = next.currentTime - previous.currentTime;
-				var expected = (elapsed * (state.speed || 1)) / 1000;
-				var diff = seeked - expected;
+				var expectedSeek = (elapsed * (state.speed || 1)) / 1000;
+				var diff = seeked - expectedSeek;
 				if (Math.abs(diff) < CHANGE_DIFF_CUTOFF) return resolve();
 			}
 			previous = next;
