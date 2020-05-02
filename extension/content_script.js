@@ -9,7 +9,11 @@ var element;
 var syncListener;
 var expected = null;
 
-var SET_STATE_TIME_DIFF_CUTOFF = 1;
+var stopReportingTimeout = null;
+
+const ONE_HOUR_MS = 60 * 60 * 1000;
+
+const SET_STATE_TIME_DIFF_CUTOFF = 1;
 
 const CHANGE_DIFF_CUTOFF = 0.5;
 const FOLLOW_UP_TICKS = 5;
@@ -18,11 +22,13 @@ const FOLLOW_UP_MIN_PLAYBACK = 0.3;
 const FOLLOW_UP_MAX_PLAYBACK = 3;
 const FOLLOW_UP_CUTOFF = 0.001;
 
-var SYNC_FOLLOWED = "followed";
-var SYNC_SYNCING = "syncing";
-var SYNC_SYNCED = "synced";
-var SYNC_FAILED = "failed";
-var SYNC_CLEARED = "cleared";
+const SYNC_FOLLOWED = "followed";
+const SYNC_SYNCING = "syncing";
+const SYNC_SYNCED = "synced";
+const SYNC_FAILED = "failed";
+const SYNC_CLEARED = "cleared";
+
+//
 
 console.log("moviedate start");
 
@@ -35,6 +41,12 @@ function getState() {
 	var duration = element.duration;
 	var date = getCurrentTime();
 	var url = window.location.href;
+	if (paused) {
+		stopReportingInAnHour();
+	} else {
+		clearTimeout(stopReportingTimeout);
+		stopReportingTimeout = null;
+	}
 	if (!duration) return console.log("no duration?");
 	return {
 		id,
@@ -55,61 +67,7 @@ function handleVal(val) {
 	peers = val;
 }
 
-function followUp(state) {
-	console.log("followUp");
-	if (state.paused !== false) return;
-	return ensurePlaying(state)
-		.then(() => followUpHelper(state, FOLLOW_UP_TICKS))
-		.then(() => {
-			element.playbackRate = state.speed;
-		});
-}
-
-function ensurePlaying(state) {
-	var previous;
-	return new Promise((resolve, reject) => {
-		function helper(ticks) {
-			var next = {
-				time: getCurrentTime(),
-				currentTime: element.currentTime,
-			};
-			if (previous !== undefined) {
-				var elapsed = next.time - previous.time;
-				var seeked = next.currentTime - previous.currentTime;
-				var expected = (elapsed * (state.speed || 1)) / 1000;
-				var diff = seeked - expected;
-				if (Math.abs(diff) < CHANGE_DIFF_CUTOFF) return resolve();
-			}
-			previous = next;
-			if (ticks === 0) return reject("could not ensure playing");
-			setTimeout(() => helper(ticks - 1), FOLLOW_UP_TICK_DURATION);
-		}
-		helper(FOLLOW_UP_TICKS);
-	});
-}
-
-function followUpHelper(state, ticks) {
-	if (ticks > 0) {
-		var stateTime = determineTime(state);
-		var diff = stateTime - element.currentTime;
-		if (diff === 0 || Math.abs(diff) > FOLLOW_UP_CUTOFF) {
-			var relative = (1000 * diff) / FOLLOW_UP_TICK_DURATION;
-			var newPlayback = state.speed + relative;
-			if (newPlayback < FOLLOW_UP_MIN_PLAYBACK) {
-				if (relative < 0) return;
-				newPlayback = FOLLOW_UP_MIN_PLAYBACK;
-			} else if (newPlayback > FOLLOW_UP_MAX_PLAYBACK) {
-				if (relative > 0) return;
-				newPlayback = FOLLOW_UP_MAX_PLAYBACK;
-			}
-			// luckily this works for netflix too!
-			element.playbackRate = newPlayback;
-			return new Promise((resolve) => {
-				setTimeout(resolve, FOLLOW_UP_TICK_DURATION);
-			}).then(() => followUpHelper(state, ticks - 1));
-		}
-	}
-}
+//
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 	// console.log("receive", message.type, message);
@@ -252,4 +210,68 @@ function isDifferent(a, b, tag) {
 function logDifferent(tag, key, meKey, expectedKey) {
 	console.log(`different ${tag} ${key} ${meKey} ${expectedKey}`);
 	expected = null;
+}
+
+function followUp(state) {
+	console.log("followUp");
+	if (state.paused !== false) return;
+	return ensurePlaying(state)
+		.then(() => tweakTimeToSync(state, FOLLOW_UP_TICKS))
+		.then(() => {
+			element.playbackRate = state.speed;
+		});
+}
+
+function ensurePlaying(state) {
+	var previous;
+	return new Promise((resolve, reject) => {
+		function helper(ticks) {
+			var next = {
+				time: getCurrentTime(),
+				currentTime: element.currentTime,
+			};
+			if (previous !== undefined) {
+				var elapsed = next.time - previous.time;
+				var seeked = next.currentTime - previous.currentTime;
+				var expected = (elapsed * (state.speed || 1)) / 1000;
+				var diff = seeked - expected;
+				if (Math.abs(diff) < CHANGE_DIFF_CUTOFF) return resolve();
+			}
+			previous = next;
+			if (ticks === 0) return reject("could not ensure playing");
+			setTimeout(() => helper(ticks - 1), FOLLOW_UP_TICK_DURATION);
+		}
+		helper(FOLLOW_UP_TICKS);
+	});
+}
+
+function tweakTimeToSync(state, ticks) {
+	if (ticks > 0) {
+		var stateTime = determineTime(state);
+		var diff = stateTime - element.currentTime;
+		if (diff === 0 || Math.abs(diff) > FOLLOW_UP_CUTOFF) {
+			var relative = (1000 * diff) / FOLLOW_UP_TICK_DURATION;
+			var newPlayback = state.speed + relative;
+			if (newPlayback < FOLLOW_UP_MIN_PLAYBACK) {
+				if (relative < 0) return;
+				newPlayback = FOLLOW_UP_MIN_PLAYBACK;
+			} else if (newPlayback > FOLLOW_UP_MAX_PLAYBACK) {
+				if (relative > 0) return;
+				newPlayback = FOLLOW_UP_MAX_PLAYBACK;
+			}
+			// luckily this works for netflix too!
+			element.playbackRate = newPlayback;
+			return new Promise((resolve) => {
+				setTimeout(resolve, FOLLOW_UP_TICK_DURATION);
+			}).then(() => tweakTimeToSync(state, ticks - 1));
+		}
+	}
+}
+
+function stopReportingInAnHour() {
+	if (stopReportingTimeout !== null) return;
+	stopReportingTimeout = setTimeout(() => {
+		clearInterval(reportInverval);
+		reportInverval = undefined;
+	}, ONE_HOUR_MS);
 }
