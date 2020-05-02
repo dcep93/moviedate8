@@ -1,3 +1,5 @@
+const VERSION = "v4.0.0";
+
 var email;
 var peers;
 var syncingStatus = {};
@@ -23,6 +25,35 @@ var SYNC_FAILED = "failed";
 var SYNC_CLEARED = "cleared";
 
 console.log("moviedate start");
+
+function getState() {
+	var rawId = `${window.location.host || "local"}`;
+	var id = rawId.replace(/\./g, "_");
+	var speed = element.playbackRate;
+	var time = element.currentTime;
+	var paused = element.paused;
+	var duration = element.duration;
+	var date = getCurrentTime();
+	var url = window.location.href;
+	if (!duration) return console.log("no duration?");
+	return {
+		id,
+		email,
+		speed,
+		time,
+		paused,
+		duration,
+		date,
+		dateOffset,
+		url,
+		syncingStatus,
+		version: VERSION,
+	};
+}
+
+function handleVal(val) {
+	peers = val;
+}
 
 function followUp(state) {
 	console.log("followUp");
@@ -112,7 +143,8 @@ function init(sendResponse, message) {
 		.then(setDateOffset)
 		.then(beginReporting)
 		.then(handleInject)
-		.then(() => sendResponse(dateOffset));
+		.then(() => dateOffset)
+		.then(sendResponse);
 }
 
 function query(sendResponse) {

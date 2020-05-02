@@ -32,6 +32,5 @@ chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
 });
 
 function allowNonValidPage() {
-	// means this is a non-dropbox/youtube page - this is fine
 	chrome.runtime.lastError;
 }

@@ -24,7 +24,7 @@ function handleInject() {
 }
 
 function setInjectedElement() {
-	return new Promise((resolve, reject) => {
+	return new Promise((resolve) => {
 		setTimeout(() => {
 			injectedElement = document.getElementById(INJECTED_ELEMENT_ID);
 			resolve();

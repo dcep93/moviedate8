@@ -36,32 +36,27 @@ function submitForm() {
 	var state = { date };
 	if (document.activeElement === speedInput) state.speed = speedInput.value;
 	if (document.activeElement === timeInput) state.time = timeInput.value;
-	chrome.tabs.sendMessage(tabId, { type: "set_state", state }, function (
-		response
-	) {
-		if (response === undefined) {
-			allowNonValidPage();
-		} else if (response !== true) {
-			window.close();
-			return alert(response);
-		}
-	});
+	chrome.tabs.sendMessage(
+		tabId,
+		{ type: "set_state", state },
+		receiveResponse
+	);
 	return false;
 }
 
 function sync(key) {
 	if (tabId === undefined) return alert("sync error");
-	chrome.tabs.sendMessage(tabId, { type: "sync", key }, function (response) {
-		if (response === undefined) {
-			allowNonValidPage();
-		} else if (response !== true) {
-			window.close();
-			return alert(response);
-		}
-	});
+	chrome.tabs.sendMessage(tabId, { type: "sync", key }, receiveResponse);
 }
 
-form.onsubmit = submitForm;
+function receiveResponse(response) {
+	if (response === undefined) {
+		allowNonValidPage();
+	} else if (response !== true) {
+		window.close();
+		return alert(response);
+	}
+}
 
 function setPopupState(state) {
 	setPeers(state.peers, state.email);
@@ -75,9 +70,11 @@ function setSelfState(self) {
 		timeInput.value = determineTime(self).toFixed(2);
 }
 
-peersDiv.removeChild(peerTemplate);
-peerTemplate.hidden = false;
-peerTemplate.removeAttribute("id");
+function tooOld(peer) {
+	var ageMs = getCurrentTime() - peer.date;
+	var oneMinute = 1000 * 60;
+	return ageMs > oneMinute;
+}
 function setPeers(peers, email) {
 	var keys = Object.keys(peers);
 	var myKey = keys.filter((key) => peers[key].email === email);
@@ -123,8 +120,8 @@ function setPeers(peers, email) {
 	}
 }
 
-function tooOld(peer) {
-	var ageMs = getCurrentTime() - peer.date;
-	var oneMinute = 1000 * 60;
-	return ageMs > oneMinute;
-}
+form.onsubmit = submitForm;
+
+peersDiv.removeChild(peerTemplate);
+peerTemplate.hidden = false;
+peerTemplate.removeAttribute("id");

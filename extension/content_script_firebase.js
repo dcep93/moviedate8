@@ -1,13 +1,16 @@
 // https://console.firebase.google.com/u/0/project/moviedatesync/database/moviedatesync/data
 
-const VERSION = "v4.0.0";
-
 var PREFIX = "data";
 var FREQUENCY = 1000;
 
 var db;
 var listenerRef;
 var reportInverval;
+
+// need to define:
+// type state {email: string, id: string}
+// getState() state
+// handleVal({string: state})
 
 function getDb() {
 	if (db === undefined) {
@@ -37,33 +40,9 @@ function setDateOffset() {
 		});
 }
 
-function getState() {
-	var rawId = `${window.location.host || "local"}`;
-	var id = rawId.replace(/\./g, "_");
-	var speed = element.playbackRate;
-	var time = element.currentTime;
-	var paused = element.paused;
-	var duration = element.duration;
-	var date = getCurrentTime();
-	var url = window.location.href;
-	return {
-		id,
-		email,
-		speed,
-		time,
-		paused,
-		duration,
-		date,
-		dateOffset,
-		url,
-		syncingStatus,
-		version: VERSION,
-	};
-}
-
 function reportState() {
 	var args = getState();
-	if (isNaN(args.duration)) return console.log(args);
+	if (!args) return;
 	postToFirebase(args);
 }
 
@@ -83,6 +62,7 @@ function listen(firebaseId) {
 	}
 	listenerRef = db.ref(firebaseId);
 	listenerRef.on("value", function (snapshot) {
-		peers = snapshot.val();
+		var val = snapshot.val();
+		handleVal(val);
 	});
 }
