@@ -97,8 +97,10 @@ function init(sendResponse, message) {
 	if (element === undefined || isNaN(element.duration))
 		return sendResponse("no video found");
 	email = message.email;
+
 	Promise.resolve()
-		.then(dateOffset === undefined && setDateOffset)
+		.then(getDb)
+		.then(() => setTimeout(setDateOffset))
 		.then(beginReporting)
 		.then(handleInject)
 		.then(() => dateOffset)

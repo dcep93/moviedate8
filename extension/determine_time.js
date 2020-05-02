@@ -1,4 +1,4 @@
-var dateOffset;
+var dateOffset = null;
 
 function determineTime(state) {
 	if (state.paused || !state.speed) return state.time;

@@ -25,14 +25,14 @@ function getDb() {
 
 function beginReporting() {
 	if (reportInverval !== undefined) return;
-	getDb();
 	reportState();
 	reportInverval = setInterval(reportState, FREQUENCY);
 }
 
 function setDateOffset() {
+	if (dateOffset !== null) return;
 	var path = ".info/serverTimeOffset";
-	return getDb()
+	return db
 		.ref(path)
 		.once("value")
 		.then(function (data) {
