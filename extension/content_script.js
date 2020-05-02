@@ -98,6 +98,8 @@ function init(sendResponse, message) {
 		return sendResponse("no video found");
 	email = message.email;
 
+	peers = { [email]: getState() };
+
 	Promise.resolve()
 		.then(getDb)
 		.then(() => setTimeout(setDateOffset))
