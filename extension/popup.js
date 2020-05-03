@@ -6,6 +6,7 @@ var timeInput = document.getElementById("time");
 var versionDiv = document.getElementById("version");
 var advancedDiv = document.getElementById("advanced");
 var offsetInput = document.getElementById("dateOffset");
+var subtitleInput = document.getElementById("subtitles");
 
 var form = document.getElementById("form");
 
@@ -81,6 +82,7 @@ function tooOld(peer) {
 	var oneMinute = 1000 * 60;
 	return ageMs > oneMinute;
 }
+
 function setPeers(peers, email) {
 	var keys = Object.keys(peers);
 	var myKey = keys.filter((key) => peers[key].email === email);
@@ -125,6 +127,24 @@ function setPeers(peers, email) {
 		}
 	}
 }
+
+function submitSubtitles() {
+	var subtitleFile = this.files[0];
+	var fr = new FileReader();
+	fr.onload = () => {
+		content = fr.result;
+		chrome.tabs.sendMessage(
+			tabId,
+			{ type: "subtitles", content },
+			receiveResponse
+		);
+	};
+
+	fr.readAsText(subtitleFile);
+}
+
+subtitleInput.parentElement.style.width = 0;
+subtitleInput.onchange = submitSubtitles;
 
 versionDiv.onclick = () => (advancedDiv.hidden = false);
 

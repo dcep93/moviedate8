@@ -87,6 +87,8 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 		case "sync":
 			sync(respond, message);
 			break;
+		case "subtitles":
+			addSubtitles(respond, message);
 		default:
 			return respond(`invalid type: ${message.type}`);
 	}
@@ -171,6 +173,15 @@ function sync(sendResponse, message) {
 			syncingStatus.status = SYNC_FAILED;
 			console.log(err);
 		});
+	sendResponse(true);
+}
+
+function addSubtitles(sendResponse, message) {
+	track = element.addTextTrack("captions", "English", "en");
+	track.mode = "showing";
+
+	subtitleParser(message.content).forEach(track.addCue.bind(track));
+	alert("subs", message.content.length);
 	sendResponse(true);
 }
 

@@ -19,6 +19,7 @@
 			],
 			"js": [
 				"content_script.js",
+				"content_script_subtitle_parser.js",
 				"content_script_firebase.js",
 				"content_script_inject.js",
 				"determine_time.js",
