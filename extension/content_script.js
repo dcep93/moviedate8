@@ -181,7 +181,6 @@ function addSubtitles(sendResponse, message) {
 	track.mode = "showing";
 
 	subtitleParser(message.content).forEach(track.addCue.bind(track));
-	alert("subs", message.content.length);
 	sendResponse(true);
 }
 
