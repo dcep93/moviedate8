@@ -100,9 +100,7 @@ function setPeers(peers, email) {
 		if (!peerDiv) {
 			peerDiv = peerTemplate.cloneNode(true);
 			peerDiv.querySelector(".peer_email").innerText = peer.email;
-			peerDiv.querySelector(".peer_sync").onclick = () => {
-				sync(key);
-			};
+			peerDiv.querySelector(".peer_sync").onclick = () => sync(key);
 			peerDiv.setAttribute("id", id);
 			peersDiv.appendChild(peerDiv);
 		}

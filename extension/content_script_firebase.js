@@ -47,9 +47,8 @@ function reportState() {
 }
 
 function postToFirebase(args) {
-	var emailKey = args.email.replace(/\./g, "_");
 	var firebaseId = [PREFIX, args.id].join("/");
-	var path = [firebaseId, emailKey].join("/");
+	var path = [firebaseId, args.key].join("/");
 	db.ref(path).set(args).catch(alert);
 
 	listen(firebaseId);

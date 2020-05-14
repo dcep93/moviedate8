@@ -1,7 +1,7 @@
 const VERSION = "v4.1.0";
 
 var email;
-var peers;
+var peers = {};
 var syncingStatus = {};
 
 var element;
@@ -41,6 +41,7 @@ function getState() {
 	var duration = element.duration;
 	var date = getCurrentTime();
 	var url = window.location.href;
+	var key = email.replace(/\./g, "_");
 	if (paused) {
 		stopReportingInAnHour();
 	} else {
@@ -51,6 +52,7 @@ function getState() {
 	return {
 		id,
 		email,
+		key,
 		speed,
 		time,
 		paused,
@@ -99,8 +101,9 @@ function init(sendResponse, message) {
 	if (element === undefined || isNaN(element.duration))
 		return sendResponse("no video found");
 	email = message.email;
+	var state = getState();
 
-	peers = { [email]: getState() };
+	peers[state.key] = getState();
 
 	Promise.resolve()
 		.then(getDb)
