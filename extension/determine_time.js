@@ -2,9 +2,12 @@ var dateOffset = null;
 
 function determineTime(state) {
 	if (state.paused || !state.speed) return state.time;
-	var ageMs = getCurrentTime() - parseInt(state.date);
+	const ct = getCurrentTime();
+	var ageMs = ct - parseInt(state.date);
 	var secondsAdvanced = (ageMs * parseFloat(state.speed)) / 1000;
-	return parseFloat(state.time) + secondsAdvanced;
+	t = parseFloat(state.time) + secondsAdvanced;
+	if (isNaN(t)) console.log("NaN", JSON.stringify(state), ct, dateOffset);
+	return t;
 }
 
 function getCurrentTime() {
