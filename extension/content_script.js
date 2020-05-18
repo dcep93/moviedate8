@@ -49,6 +49,7 @@ function getState() {
 		stopReportingTimeout = null;
 	}
 	if (!duration) return console.log("no duration?");
+	if (!time && time !== 0) return console.log("no time?", time);
 	return {
 		id,
 		email,
