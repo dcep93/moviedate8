@@ -3,19 +3,7 @@
 		<title>Movie Date</title>
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" href="favicon.ico" />
-	</head>
-	<body>
-		<div id="video_div">
-			<video id="video" controls="" autoplay="" name="media"></video>
-		</div>
-		<div>
-			<h1>
-				<a
-					href="https://chrome.google.com/webstore/detail/movie-date/iofdkijmnaoabjndjbichhbllhbbkbde"
-					>Get Movie Date Extension</a
-				>
-			</h1>
-		</div>
+
 		<link rel="stylesheet" type="text/css" href="widget/widget.css" />
 		<script type="text/javascript" src="widget/widget.js"></script>
 		<script
@@ -38,6 +26,31 @@
 			type="text/javascript"
 			src="extension/firebase/firebase-database.js"
 		></script>
+	</head>
+	<body>
+		<div id="video_div">
+			<video id="video" controls="" autoplay="" name="media"></video>
+		</div>
+		<div>
+			<h1>
+				<a
+					href="https://chrome.google.com/webstore/detail/movie-date/iofdkijmnaoabjndjbichhbllhbbkbde"
+					>Get Movie Date Extension</a
+				>
+			</h1>
+		</div>
+		<div>
+			<form class="flex">
+				<div class="bubble">
+					<div>From File</div>
+					<input id="from_file" type="file" />
+				</div>
+				<div class="bubble">
+					<div>From Download Link</div>
+					<input name="src" type="text" />
+				</div>
+			</form>
+		</div>
 		<div class="bubble">
 			<h1>Sync Tool</h1>
 			<div id="top">
@@ -119,8 +132,4 @@
 			</div>
 		</div>
 	</body>
-	<script>
-		const src = location.href.split("src=")[1];
-		if (src) document.getElementById("video").src = decodeURIComponent(src);
-	</script>
 </html>
