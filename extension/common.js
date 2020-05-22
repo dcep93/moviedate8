@@ -22,7 +22,7 @@ chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
 					);
 				} else {
 					tabId = tabId_;
-					init(response);
+					initP(response);
 					// // send message to background
 					// chrome.runtime.sendMessage({ tabId });
 				}

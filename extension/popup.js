@@ -13,7 +13,7 @@ var form = document.getElementById("form");
 var peerTemplate = document.getElementById("peer_template");
 var peersDiv = peerTemplate.parentElement;
 
-function init() {
+function initP() {
 	queryTab();
 	setInterval(queryTab, FREQUENCY);
 }

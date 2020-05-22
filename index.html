@@ -1,0 +1,121 @@
+<html>
+	<head>
+		<title>Movie Date</title>
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" href="favicon.ico" />
+	</head>
+	<body>
+		<div id="video_div">
+			<video id="video" controls="" autoplay="" name="media"></video>
+		</div>
+		<div>
+			<h1>
+				<a
+					href="https://chrome.google.com/webstore/detail/movie-date/iofdkijmnaoabjndjbichhbllhbbkbde"
+					>Get Movie Date Extension</a
+				>
+			</h1>
+		</div>
+		<script type="text/javascript" src="widget.js"></script>
+		<script
+			type="text/javascript"
+			src="extension/content_script.js"
+		></script>
+		<script
+			type="text/javascript"
+			src="extension/content_script_firebase.js"
+		></script>
+		<script
+			type="text/javascript"
+			src="extension/firebase/firebase-app.js"
+		></script>
+		<script
+			type="text/javascript"
+			src="extension/firebase/firebase-database.js"
+		></script>
+		<link rel="stylesheet" type="text/css" href="widget.css" />
+		<div class="bubble">
+			<div id="top">
+				<div id="peers">
+					<div hidden id="peer_template" class="bubble">
+						<div class="peer_email">email@example.com</div>
+						<div class="peer_stats">
+							<span>
+								<div>x<span class="peer_speed">1.0</span></div>
+								<div class="peer_time">4.20</div></span
+							>
+							<span><button class="peer_sync">Sync</button></span>
+						</div>
+					</div>
+				</div>
+				<div id="you">
+					<form id="form">
+						<div id="email">@</div>
+						<div>
+							Playback Speed
+							<input
+								id="speed"
+								name="speed"
+								type="number"
+								step="0.01"
+								value=""
+							/>
+							<input type="submit" hidden />
+						</div>
+						<div>
+							Current Time
+							<input
+								id="time"
+								name="time"
+								type="number"
+								step="0.01"
+								value=""
+							/>
+							<input type="submit" hidden />
+						</div>
+						<div>
+							Subtitles <input type="file" id="subtitles" />
+						</div>
+						<div id="version">v4.2.0</div>
+						<div id="advanced" hidden>
+							<div>
+								Date Offset
+								<input
+									id="dateOffset"
+									name="dateOffset"
+									type="number"
+									step="0.001"
+									value=""
+								/>
+								<input type="submit" hidden />
+							</div>
+						</div>
+					</form>
+				</div>
+				<div hidden>
+					<link
+						rel="stylesheet"
+						type="text/css"
+						href="extension/popup.css"
+					/>
+					<script
+						type="text/javascript"
+						src="extension/determine_time.js"
+					></script>
+					<script
+						type="text/javascript"
+						src="extension/common.js"
+					></script>
+					<script
+						type="text/javascript"
+						src="extension/popup.js"
+					></script>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		const src = location.href.split("src=")[1];
+		if (src) document.getElementById("video").src = decodeURIComponent(src);
+	</script>
+</html>
