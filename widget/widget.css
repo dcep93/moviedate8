@@ -16,3 +16,7 @@ body {
 .flex {
 	display: flex;
 }
+
+input {
+	background-color: lightgray;
+}
