@@ -92,6 +92,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 			break;
 		case "subtitles":
 			addSubtitles(respond, message);
+			break;
 		default:
 			return respond(`invalid type: ${message.type}`);
 	}
