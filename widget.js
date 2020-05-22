@@ -1,4 +1,7 @@
 const id = Math.random().toFixed(4).slice(2);
+const handleInject = () => null;
+const inject = null;
+
 var listener;
 
 function query(_, f) {
@@ -16,8 +19,6 @@ function sendMessage(_, payload, f) {
 function addListener(f) {
 	listener = f;
 }
-
-const handleInject = () => null;
 
 window.chrome = {
 	tabs: { query, sendMessage },
