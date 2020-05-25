@@ -6,7 +6,6 @@ function determineTime(state) {
 	var ageMs = ct - parseInt(state.date);
 	var secondsAdvanced = (ageMs * parseFloat(state.speed)) / 1000;
 	t = parseFloat(state.time) + secondsAdvanced;
-	if (isNaN(t)) console.log("NaN", JSON.stringify(state), ct, dateOffset);
 	return t;
 }
 

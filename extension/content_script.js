@@ -169,7 +169,7 @@ function setStatePromise(state) {
 function sync(sendResponse, message) {
 	if (syncListener !== undefined) syncListener.off();
 	var key = message.key;
-	var peer = peers[key];
+	var peer = JSON.parse(JSON.stringify(peers[key]));
 	var path = listenerRef.path.pieces_.concat(key).join("/");
 	syncingStatus = { target: key, status: SYNC_SYNCING };
 	setStateHelper(peer)
