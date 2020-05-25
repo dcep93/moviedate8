@@ -1,7 +1,7 @@
 {
 	"name": "Movie Date",
 	"description": "Syncs videos for people watching the same video at the same time.",
-	"version": "4.2.0",
+	"version": "5.0.0",
 	"icons": {
 		"16": "moviedate.png",
 		"48": "moviedate.png",

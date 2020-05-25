@@ -1,4 +1,4 @@
-const VERSION = "v4.1.0";
+const VERSION = "v5.0.0";
 
 var email;
 var peers = {};
