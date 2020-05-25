@@ -6,6 +6,7 @@ var src;
 var listener;
 var videoE;
 var queryF;
+var initializedW = false;
 
 function initW() {
 	videoE = document.getElementById("video");
@@ -27,7 +28,11 @@ function initW() {
 }
 
 function queryW(_, f) {
-	queryF = () => f([{ id }]);
+	queryF = () => {
+		if (initializedW) return;
+		initializedW = true;
+		f([{ id }]);
+	};
 	window.onload = initW;
 }
 
