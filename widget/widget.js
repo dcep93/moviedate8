@@ -57,7 +57,7 @@ function maybeAddSubtitlesFromUrlQuery() {
       .then((response) => response.text())
       .then((content) =>
         sendMessageW(null, { type: "subtitles", content }, () =>
-          console.log("loaded subs")
+          console.log("loaded subs", subsUrl)
         )
       );
   }
