@@ -52,7 +52,9 @@ function addListener(f) {
 function maybeAddSubtitlesFromUrlQuery() {
   const subsUrl = location.href.split("subs=")[1];
   if (subsUrl) {
-    const url = `https://cors-anywhere.herokuapp.com/${subsUrl}`;
+    const url = `https://cors-anywhere.herokuapp.com/${decodeURIComponent(
+      subsUrl
+    )}`;
     fetch(url)
       .then((response) => response.text())
       .then((content) =>
