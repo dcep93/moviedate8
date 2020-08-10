@@ -50,15 +50,17 @@ function addListener(f) {
 }
 
 function maybeAddSubtitlesFromUrlQuery() {
-  const url =
-    "https://cors-anywhere.herokuapp.com/https://www.dropbox.com/s/rc98lqker0hfkil/11_English.srt?dl=1";
-  fetch(url)
-    .then((response) => response.text())
-    .then(
-      (content) =>
-        sendMessageW(null, { type: "subtitles", content }, () => null),
-      () => null
-    );
+  const subsUrl = location.href.split("subs=")[1];
+  if (subsUrl) {
+    const url = `https://cors-anywhere.herokuapp.com/${subsUrl}`;
+    fetch(url)
+      .then((response) => response.text())
+      .then((content) =>
+        sendMessageW(null, { type: "subtitles", content }, () =>
+          console.log("loaded subs")
+        )
+      );
+  }
 }
 
 window.chrome = {
