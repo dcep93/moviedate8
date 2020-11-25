@@ -14,6 +14,7 @@ function initW() {
   if (!src) {
     src = location.href.split("src=")[1];
     if (src) {
+      console.log(src, decodeURIComponent(src));
       videoE.src = decodeURIComponent(src);
     }
   }
