@@ -211,6 +211,8 @@ function listenToPeer(path) {
 }
 
 function isDifferent(a, b, tag) {
+  // always follow leader for now
+  if (tag === "me") return false;
   var aTime = determineTime(a);
   var bTime = determineTime(b);
   var diff = Math.abs(aTime - bTime);
