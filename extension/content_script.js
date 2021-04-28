@@ -166,6 +166,7 @@ function setStatePromise(state) {
 }
 
 function sync(sendResponse, message) {
+  console.log(message);
   if (syncListener !== undefined) syncListener.off();
   var key = message.key;
   var peer = JSON.parse(JSON.stringify(peers[key]));

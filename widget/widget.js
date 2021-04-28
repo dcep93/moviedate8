@@ -2,6 +2,7 @@ const id = Math.random().toFixed(4).slice(2);
 const handleInject = () => null;
 const inject = null;
 
+var initializedBad = false;
 var src;
 var listener;
 var videoE;
@@ -9,6 +10,8 @@ var queryF;
 var initializedW = false;
 
 function initW() {
+  if (initializedBad) return;
+  initializedBad = true;
   videoE = document.getElementById("video");
   videoE.oncanplay = queryF;
   if (!src) {
@@ -26,6 +29,13 @@ function initW() {
       videoE.src = URL.createObjectURL(src);
     }
   });
+
+  var key = location.href.split("sync=")[1];
+  if (key) {
+    sendMessageW(null, { type: "sync", key }, () =>
+      console.log("synced to", key)
+    );
+  }
 }
 
 function queryW(_, f) {
