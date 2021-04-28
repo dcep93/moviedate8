@@ -30,18 +30,18 @@ function initW() {
     }
   });
 
-  var key = location.href.split("sync=")[1];
-  if (key) {
-    sendMessageW(null, { type: "sync", key }, () =>
-      console.log("synced to", key)
-    );
-  }
+  document.getElementById("version").innerText = VERSION;
 }
 
 function queryW(_, f) {
   queryF = () => {
     if (initializedW) return;
     initializedW = true;
+    const _handleVal = handleVal;
+    handleVal = function (val) {
+      _handleVal(val);
+      maybeSync();
+    };
     f([{ id }]);
     maybeAddSubtitlesFromUrlQuery();
   };
@@ -74,6 +74,18 @@ function maybeAddSubtitlesFromUrlQuery() {
         )
       )
       .catch(alert);
+  }
+}
+
+var hasSynced = false;
+function maybeSync() {
+  if (hasSynced) return;
+  var key = location.href.split("sync=")[1];
+  if (key) {
+    sendMessageW(null, { type: "sync", key }, () => {
+      console.log("synced to", key);
+      hasSynced = true;
+    });
   }
 }
 

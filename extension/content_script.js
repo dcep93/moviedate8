@@ -1,4 +1,4 @@
-const VERSION = "v5.1.0";
+const VERSION = "v5.2.0";
 
 var email;
 var peers = {};
@@ -166,7 +166,6 @@ function setStatePromise(state) {
 }
 
 function sync(sendResponse, message) {
-  console.log(message);
   if (syncListener !== undefined) syncListener.off();
   var key = message.key;
   var peer = JSON.parse(JSON.stringify(peers[key]));
