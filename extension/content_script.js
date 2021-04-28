@@ -195,15 +195,15 @@ function listenToPeer(path) {
   syncListener.on("value", function (snapshot) {
     var peer = snapshot.val();
     var state = getState();
-    if (
-      !expected ||
-      isDifferent(expected, state, "me") ||
-      expected.duration !== peer.duration
-    ) {
-      console.log("clearing");
-      syncingStatus.status = SYNC_CLEARED;
-      return syncListener.off();
-    }
+    // if (
+    //   !expected ||
+    //   isDifferent(expected, state, "me") ||
+    //   expected.duration !== peer.duration
+    // ) {
+    //   console.log("clearing");
+    //   syncingStatus.status = SYNC_CLEARED;
+    //   return syncListener.off();
+    // }
     if (isDifferent(expected, peer, "peer")) {
       setStateHelper(peer);
     }
@@ -211,8 +211,6 @@ function listenToPeer(path) {
 }
 
 function isDifferent(a, b, tag) {
-  // always follow leader for now
-  if (tag === "me") return false;
   var aTime = determineTime(a);
   var bTime = determineTime(b);
   var diff = Math.abs(aTime - bTime);
@@ -231,7 +229,7 @@ function isDifferent(a, b, tag) {
 
 function logDifferent(tag, key, meKey, expectedKey) {
   console.log(`different ${tag} ${key} ${meKey} ${expectedKey}`);
-  expected = null;
+  // expected = null;
 }
 
 function followUp(state) {
