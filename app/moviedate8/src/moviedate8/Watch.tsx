@@ -4,8 +4,8 @@ import css from "./index.module.css";
 import { getUsername } from "./User";
 
 const ALIGN_INTERVAL_MS = 1000;
-const GRACE_SMALL_MS = 100;
-const GRACE_BIG_MS = 2000;
+const OFFSET_MS_CUTOFF_SMALL = 100;
+const OFFSET_MS_CUTOFF_BIG = 2000;
 
 const videoRef = React.createRef<HTMLVideoElement>();
 
@@ -98,9 +98,9 @@ class Watch extends React.Component<PropsType, StateType> {
         const leaderNormalizedTime = leader.progress * 1000 - leader.timestamp;
         const myNormalizedTime = video.currentTime * 1000 - now;
         const diffMs = leaderNormalizedTime - myNormalizedTime;
-        if (Math.abs(diffMs) < GRACE_SMALL_MS) {
+        if (Math.abs(diffMs) < OFFSET_MS_CUTOFF_SMALL) {
           video.playbackRate = leader.speed;
-        } else if (Math.abs(diffMs) < GRACE_BIG_MS) {
+        } else if (Math.abs(diffMs) < OFFSET_MS_CUTOFF_BIG) {
           video.playbackRate = diffMs / ALIGN_INTERVAL_MS + leader.speed;
         } else {
           video.currentTime = leader.progress + (now - leader.timestamp) / 1000;
