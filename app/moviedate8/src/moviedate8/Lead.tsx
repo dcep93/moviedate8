@@ -1,5 +1,6 @@
 import React from "react";
 import firebase, { LibraryType, VideoType } from "./firebase";
+import css from "./index.module.css";
 import { getUsername } from "./User";
 
 const urlRef = React.createRef<HTMLInputElement>();
@@ -40,7 +41,11 @@ function Lead(props: {
       >
         <div>
           Library:{" "}
-          <select ref={selectRef}>
+          <select
+            className={css.library_select}
+            ref={selectRef}
+            onChange={() => (urlRef.current!.value = "")}
+          >
             <option></option>
             {Object.entries(props.library)
               .flatMap(([folderName, videos]) =>
@@ -72,7 +77,12 @@ function Lead(props: {
           </select>
         </div>
         <div>
-          url: <input ref={urlRef} defaultValue={props.url} />
+          url:{" "}
+          <input
+            ref={urlRef}
+            className={css.url_input}
+            defaultValue={props.url}
+          />
         </div>
         <input type="submit" value="Submit" />
       </form>

@@ -9,6 +9,14 @@
     width: 100vw;
 }
 
+.library_select {
+    width: 200px;
+}
+
+.url_input {
+    width: 300px;
+}
+
 .padding {
     padding: 20px;
 }
