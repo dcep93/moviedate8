@@ -3,10 +3,8 @@
 import firebase from "./firebase";
 
 export enum StateEnum {
-  loading,
-  playing,
   paused,
-  errored,
+  playing,
 }
 
 export type WatcherType = {

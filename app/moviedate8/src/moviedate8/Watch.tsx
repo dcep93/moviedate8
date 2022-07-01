@@ -73,23 +73,27 @@ class Watch extends React.Component<PropsType, StateType> {
   }
 
   send(start?: number) {
-    const state = this.getState();
     return firebase.writeWatcher(getUsername()!, {
       start: start || this.state.start!,
       timestamp: Date.now(),
       url: videoRef.current!.src,
       progress: videoRef.current!.currentTime,
       speed: videoRef.current!.playbackRate,
-      state,
+      state: videoRef.current!.paused ? StateEnum.paused : StateEnum.playing,
     });
   }
 
   align() {
+    const leader = this.props.leader!;
+    const video = videoRef.current!;
+    if (leader.state === StateEnum.paused) {
+      if (!video.paused) video.pause();
+      video.currentTime = leader.progress;
+    } else {
+      if (video.paused) video.play();
+      video.playbackRate = 1;
+    }
     this.send();
-  }
-
-  getState(): StateEnum {
-    return StateEnum.errored;
   }
 
   render() {
