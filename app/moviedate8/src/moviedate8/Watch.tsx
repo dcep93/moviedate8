@@ -4,6 +4,8 @@ import { getUsername } from "./User";
 
 const ALIGN_INTERVAL_MS = 1000;
 
+const videoRef = React.createRef<HTMLVideoElement>();
+
 type PropsType = {
   leader?: WatcherType;
   leaderProps?: {
@@ -66,7 +68,7 @@ class Watch extends React.Component<PropsType, StateType> {
   }
 
   render() {
-    return <></>;
+    return <video ref={videoRef} />;
   }
 }
 
