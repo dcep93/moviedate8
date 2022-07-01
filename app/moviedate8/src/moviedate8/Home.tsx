@@ -7,7 +7,10 @@ import Watch from "./Watch";
 
 const OLD_WATCHER_CUTOFF_MS = 30000;
 
-class Home extends FirebaseWrapper<EverythingType, { lead?: boolean }> {
+class Home extends FirebaseWrapper<
+  EverythingType,
+  { lead?: boolean; follow?: string | null }
+> {
   getFirebasePath(): string {
     return "/";
   }
@@ -15,10 +18,14 @@ class Home extends FirebaseWrapper<EverythingType, { lead?: boolean }> {
   render() {
     if (!this.state) return <>Loading...</>;
     const everything = this.state.state || {};
+    const leader =
+      this.props.follow === undefined
+        ? everything.leader
+        : this.props.follow || undefined;
     return (
       <SubHome
         isLead={Boolean(this.props.lead)}
-        leader={everything.leader}
+        leader={leader}
         watchers={everything.watchers || {}}
       />
     );
@@ -27,7 +34,7 @@ class Home extends FirebaseWrapper<EverythingType, { lead?: boolean }> {
 
 type SubHomePropsType = {
   isLead: boolean;
-  leader: string;
+  leader?: string;
   watchers: WatchersType;
 };
 class SubHome extends React.Component<
@@ -41,7 +48,7 @@ class SubHome extends React.Component<
         ([_, watcher]) => now - watcher.timestamp < OLD_WATCHER_CUTOFF_MS
       )
     );
-    const leaderW = filteredWatchers[this.props.leader];
+    const leaderW = filteredWatchers[this.props.leader!];
     return (
       <div>
         {this.props.isLead && (

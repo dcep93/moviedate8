@@ -3,7 +3,7 @@ import firebase, { StateEnum, WatcherType } from "./firebase";
 import css from "./index.module.css";
 import { getUsername } from "./User";
 
-const ALIGN_INTERVAL_MS = 1000;
+const ALIGN_INTERVAL_MS = 10000;
 const OFFSET_MS_CUTOFF_SMALL = 100;
 const OFFSET_MS_CUTOFF_BIG = 2000;
 
@@ -91,7 +91,7 @@ class Watch extends React.Component<PropsType, StateType> {
     Promise.resolve()
       .then(() => {
         const leader = this.props.leaderW!;
-        if (leader.user_name !== getUsername()) {
+        if (leader && leader.user_name !== getUsername()) {
           const video = videoRef.current!;
           if (leader.state === StateEnum.paused) {
             if (!video.paused) video.pause();

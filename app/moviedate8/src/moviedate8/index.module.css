@@ -16,6 +16,11 @@
     padding: 10px;
     margin: 2px;
     width: 9em;
+    color: white
+}
+
+.subinfo:hover {
+    cursor: pointer;
 }
 
 .brokensubinfo {

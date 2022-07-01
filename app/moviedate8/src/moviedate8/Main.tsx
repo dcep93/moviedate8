@@ -15,16 +15,25 @@ function Main() {
       <BrowserRouter>
         <Routes>
           <Route
-            path={"/stream/:toStream"}
+            path={"/stream/:stream"}
             element={
               <Routed
-                element={(params: Params) => (
-                  <Stream rawToStream={params.toStream!} />
+                elementF={(params: Params) => (
+                  <Stream rawToStream={params.stream!} />
                 )}
               />
             }
           />
-          <Route path={"/lead"} element={<Home lead={true} />} />
+          <Route path={"/follow"} element={<Home follow={null} />} />
+          <Route
+            path={"/follow/:follow"}
+            element={
+              <Routed
+                elementF={(params: Params) => <Home follow={params.follow} />}
+              />
+            }
+          />
+          <Route path={"/lead"} element={<Home lead />} />
           <Route index element={<Home />} />
         </Routes>
       </BrowserRouter>
@@ -32,9 +41,9 @@ function Main() {
   );
 }
 
-function Routed(props: { element: (params: Params) => JSX.Element }) {
+function Routed(props: { elementF: (params: Params) => JSX.Element }) {
   let params = useParams();
-  return props.element(params);
+  return props.elementF(params);
 }
 
 export default Main;
