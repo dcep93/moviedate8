@@ -1,5 +1,6 @@
 import React from "react";
 import firebase, { StateEnum, WatcherType } from "./firebase";
+import css from "./index.module.css";
 import { getUsername } from "./User";
 
 // https://nw6.seedr.cc/ff_get_premium/1193760934/Schitts%20Creek.S03E12%20Friends%20and%20Family.mkv?st=rDYBhpf5-ydEf0ZkzhLbNA&e=1656839231
@@ -60,18 +61,15 @@ class Watch extends React.Component<PropsType, StateType> {
   setUrl(url: string) {
     return new Promise((resolve, reject) => {
       videoRef.current!.oncanplay = resolve;
-      videoRef.current!.onerror = (event) => {
+      videoRef.current!.onerror = () => {
         reject(videoRef.current!.error!.message);
       };
+      videoRef.current!.onchange = (event) => console.log(event);
       videoRef.current!.src = url;
     }).catch((err) => {
       alert(err);
       throw err;
     });
-  }
-
-  align() {
-    this.send();
   }
 
   send(start?: number) {
@@ -86,6 +84,10 @@ class Watch extends React.Component<PropsType, StateType> {
     });
   }
 
+  align() {
+    this.send();
+  }
+
   getState(): StateEnum {
     return StateEnum.errored;
   }
@@ -93,7 +95,7 @@ class Watch extends React.Component<PropsType, StateType> {
   render() {
     return (
       <div>
-        <video ref={videoRef} />
+        <video controls className={css.video} ref={videoRef} />
       </div>
     );
   }
