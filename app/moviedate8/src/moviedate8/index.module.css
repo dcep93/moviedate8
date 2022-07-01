@@ -8,3 +8,16 @@
     height: 99vh;
     width: 100vw;
 }
+
+.subinfo {
+    background-color: rgb(42, 42, 42);
+    display: inline-block;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 2px;
+    width: 9em;
+}
+
+.brokensubinfo {
+    background-color: gray;
+}
