@@ -1,5 +1,6 @@
 import React from "react";
 import { EverythingType, FirebaseWrapper, WatchersType } from "./firebase";
+import css from "./index.module.css";
 import Info from "./Info";
 import Lead from "./Lead";
 import User from "./User";
@@ -51,20 +52,24 @@ class SubHome extends React.Component<
     const leaderW = filteredWatchers[this.props.leader!];
     return (
       <div>
-        {this.props.isLead && (
-          <Lead
-            url={leaderW?.url}
-            update={(url: string) =>
-              new Promise((resolve, reject) =>
-                this.setState({ leaderProps: { resolve, url } })
-              )
-            }
-            finishUpdate={() => this.setState({ leaderProps: undefined })}
-          />
-        )}
-        <User watchers={filteredWatchers} />
-        <Info leader={this.props.leader} watchers={filteredWatchers} />
         <Watch leaderW={leaderW} leaderProps={this.state?.leaderProps} />
+        <div className={css.padding}>
+          <div className={css.inline}>
+            <User watchers={filteredWatchers} />
+            {this.props.isLead && (
+              <Lead
+                url={leaderW?.url}
+                update={(url: string) =>
+                  new Promise((resolve, reject) =>
+                    this.setState({ leaderProps: { resolve, url } })
+                  )
+                }
+                finishUpdate={() => this.setState({ leaderProps: undefined })}
+              />
+            )}
+          </div>
+          <Info leader={this.props.leader} watchers={filteredWatchers} />
+        </div>
       </div>
     );
   }

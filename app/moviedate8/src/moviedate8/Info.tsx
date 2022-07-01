@@ -21,7 +21,7 @@ class Info extends React.Component<{
       .filter((w) => w.user_name !== this.props.leader)
       .sort((a, b) => (a.user_name < b.user_name ? -1 : 1));
     return (
-      <div>
+      <div className={css.inline}>
         {leaderW && (
           <div>
             <SubInfo w={leaderW} />

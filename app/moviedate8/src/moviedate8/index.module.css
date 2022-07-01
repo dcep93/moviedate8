@@ -9,6 +9,18 @@
     width: 100vw;
 }
 
+.padding {
+    padding: 20px;
+}
+
+.openbutton {
+    margin: 50px
+}
+
+.inline {
+    display: inline-block;
+}
+
 .subinfo {
     background-color: rgb(42, 42, 42);
     display: inline-block;

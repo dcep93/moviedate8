@@ -127,7 +127,10 @@ class Watch extends React.Component<PropsType, StateType> {
     return (
       <div>
         {!this.state?.opened && (
-          <button onClick={() => this.setState({ opened: true })}>
+          <button
+            className={css.openbutton}
+            onClick={() => this.setState({ opened: true })}
+          >
             Open Video Player
           </button>
         )}
