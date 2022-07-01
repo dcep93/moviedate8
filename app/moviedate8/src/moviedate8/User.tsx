@@ -4,7 +4,7 @@ const KEY = "moviedate8/user";
 const ATTEMPTS = 3;
 
 function User(props: { watchers: WatchersType }) {
-  var userName = getUsername();
+  var userName: string | null = getUsername();
   if (userName === null) {
     for (let i = 0; i < ATTEMPTS; i++) {
       userName = prompt("enter your name");
@@ -38,8 +38,8 @@ function User(props: { watchers: WatchersType }) {
   );
 }
 
-export function getUsername(): string | null {
-  return localStorage.getItem(KEY);
+export function getUsername(): string {
+  return localStorage.getItem(KEY)!;
 }
 
 export default User;

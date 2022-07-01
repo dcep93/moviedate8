@@ -14,7 +14,8 @@ function Lead(props: {
         onSubmit={(e) =>
           Promise.resolve(e.preventDefault())
             .then(() => props.update(urlRef.current!.value))
-            .then(submit)
+            .then(getUsername)
+            .then(firebase.writeLeader)
             .then(props.finishUpdate)
             .catch((err) => {
               alert(err);
@@ -29,11 +30,6 @@ function Lead(props: {
       </form>
     </>
   );
-}
-
-function submit() {
-  const userName = getUsername()!;
-  firebase.writeLeader(userName);
 }
 
 export default Lead;

@@ -1,27 +1,33 @@
 import React from "react";
-import firebase, { EverythingType } from "./firebase";
+import firebase, { WatcherType } from "./firebase";
 import { getUsername } from "./User";
 
 const SEND_INTERVAL_MS = 1000;
-const RENDER_INTERVAL_MS = 10;
 
 type PropsType = {
-  everything: EverythingType;
-  cb: () => void;
+  leader?: WatcherType;
+  cb?: () => void;
   url?: string;
 };
 
 class Watch extends React.Component<PropsType> {
-  static cb: () => void = () => null;
+  static cb?: () => void;
+  static interval?: NodeJS.Timer;
 
-  componentDidMount() {
-    setInterval(() => this.send(), SEND_INTERVAL_MS);
+  constructor(props: PropsType) {
+    super(props);
+
+    if (this.props.url) this.init();
   }
 
   componentDidUpdate(prevProps: PropsType) {
+    if (this.props.url && !prevProps.url) this.init();
+  }
+
+  init() {
     Watch.cb = this.props.cb;
-    if (this.props.url) {
-    }
+    clearInterval(Watch.interval);
+    Watch.interval = setInterval(() => this.send(), SEND_INTERVAL_MS);
   }
 
   send() {
@@ -33,7 +39,7 @@ class Watch extends React.Component<PropsType> {
         speed: 0,
         state: 0,
       })
-      .then(Watch.cb);
+      .then(() => (Watch.cb ? Watch.cb() : null));
   }
 
   render() {
