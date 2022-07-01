@@ -3,9 +3,9 @@ import firebase, { StateEnum, WatcherType } from "./firebase";
 import css from "./index.module.css";
 import { getUsername } from "./User";
 
-// https://nw6.seedr.cc/ff_get_premium/1193760934/Schitts%20Creek.S03E12%20Friends%20and%20Family.mkv?st=rDYBhpf5-ydEf0ZkzhLbNA&e=1656839231
-
 const ALIGN_INTERVAL_MS = 1000;
+const GRACE_SMALL_MS = 100;
+const GRACE_BIG_MS = 2000;
 
 const videoRef = React.createRef<HTMLVideoElement>();
 
@@ -91,7 +91,18 @@ class Watch extends React.Component<PropsType, StateType> {
       video.currentTime = leader.progress;
     } else {
       if (video.paused) video.play();
-      video.playbackRate = 1;
+      const now = Date.now();
+      const leaderNormalizedTime = leader.progress * 1000 - leader.timestamp;
+      const myNormalizedTime = video.currentTime * 1000 - now;
+      const diffMs = leaderNormalizedTime - myNormalizedTime;
+      if (Math.abs(diffMs) < GRACE_SMALL_MS) {
+        video.playbackRate = leader.speed;
+      } else if (Math.abs(diffMs) < GRACE_BIG_MS) {
+        video.playbackRate = diffMs / ALIGN_INTERVAL_MS + leader.speed;
+      } else {
+        video.currentTime = leader.progress + (now - leader.timestamp) / 1000;
+        video.playbackRate = leader.speed;
+      }
     }
     this.send();
   }
