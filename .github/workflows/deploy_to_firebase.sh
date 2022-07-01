@@ -11,7 +11,7 @@ SA_KEY="$1"
 # gcloud iam service-accounts keys create gac.json --iam-account "deployer-github@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com"
 # cat gac.json
 
-cd ../../app/moviedate
+cd app/moviedate
 export GOOGLE_APPLICATION_CREDENTIALS="gac.json"
 echo "$SA_KEY" > "$GOOGLE_APPLICATION_CREDENTIALS"
 npm install -g firebase-tools

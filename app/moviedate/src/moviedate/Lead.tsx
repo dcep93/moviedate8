@@ -1,12 +1,5 @@
-import Follow from "./Follow";
-
 function Lead() {
-  return (
-    <>
-      <>lead</>
-      <Follow />
-    </>
-  );
+  return <>lead</>;
 }
 
 export default Lead;

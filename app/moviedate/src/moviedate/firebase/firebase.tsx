@@ -59,19 +59,19 @@ function _delete(path: string): Promise<void> {
   return remove(ref(database, `${path}`));
 }
 
-class FirebaseWrapper<T> extends React.Component<{}, { state: T }> {
-  static firebaseWrapperComponent: FirebaseWrapper<any>;
+abstract class _FirebaseWrapper<T> extends React.Component<{}, { state: T }> {
+  static firebaseWrapperComponent: _FirebaseWrapper<any>;
   componentDidMount() {
-    const oldComponent = FirebaseWrapper.firebaseWrapperComponent;
-    FirebaseWrapper.firebaseWrapperComponent = this;
+    const oldComponent = _FirebaseWrapper.firebaseWrapperComponent;
+    _FirebaseWrapper.firebaseWrapperComponent = this;
     if (oldComponent) {
       this.setState(oldComponent.state);
     } else {
       const title = this.getTitle();
       if (title !== null) document.title = title;
       _connect(this.getFirebasePath(), (state) =>
-        FirebaseWrapper.firebaseWrapperComponent.setState.bind(
-          FirebaseWrapper.firebaseWrapperComponent
+        _FirebaseWrapper.firebaseWrapperComponent.setState.bind(
+          _FirebaseWrapper.firebaseWrapperComponent
         )({ state })
       );
     }
@@ -81,12 +81,10 @@ class FirebaseWrapper<T> extends React.Component<{}, { state: T }> {
     return null;
   }
 
-  getFirebasePath(): string {
-    return `/`;
-  }
+  abstract getFirebasePath(): string;
 
   render() {
-    return <pre>{JSON.stringify(this.state, null, 2)}</pre>;
+    return <pre>{JSON.stringify(this.state?.state, null, 2)}</pre>;
   }
 }
 
@@ -96,7 +94,7 @@ const ex = {
   _set,
   _push,
   _delete,
-  FirebaseWrapper,
+  _FirebaseWrapper,
 };
 
 export default ex;
