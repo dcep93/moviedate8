@@ -6,9 +6,11 @@ export enum StateEnum {
   loading,
   playing,
   paused,
+  errored,
 }
 
 export type WatcherType = {
+  start: number;
   url: string;
   progress: number;
   timestamp: number;

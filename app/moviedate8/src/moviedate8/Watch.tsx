@@ -2,44 +2,67 @@ import React from "react";
 import firebase, { WatcherType } from "./firebase";
 import { getUsername } from "./User";
 
-const SEND_INTERVAL_MS = 1000;
+const ALIGN_INTERVAL_MS = 1000;
 
 type PropsType = {
   leader?: WatcherType;
-  cb?: () => void;
-  url?: string;
+  leaderProps?: {
+    cb: () => void;
+    url: string;
+  };
 };
 
-class Watch extends React.Component<PropsType> {
-  static cb?: () => void;
+type StateType = { start?: number };
+
+class Watch extends React.Component<PropsType, StateType> {
   static interval?: NodeJS.Timer;
 
   constructor(props: PropsType) {
     super(props);
 
-    if (this.props.url) this.init();
+    this.componentDidUpdate({});
   }
 
   componentDidUpdate(prevProps: PropsType) {
-    if (this.props.url && !prevProps.url) this.init();
+    const leader = this.props.leader;
+    if (this.props.leaderProps) {
+      if (!prevProps.leaderProps) {
+        Promise.resolve()
+          .then(() => clearInterval(Watch.interval))
+          .then(() => this.setUrl(this.props.leaderProps!.url))
+          .then(() => this.send(Date.now()))
+          .then(this.props.leaderProps.cb);
+      }
+    } else if (leader && leader.start !== this.state?.start) {
+      Promise.resolve()
+        .then(() => this.setState({ start: leader.start }))
+        .then(() => this.setUrl(leader.url))
+        .then(() => clearInterval(Watch.interval))
+        .then(
+          () =>
+            (Watch.interval = setInterval(
+              () => this.align(leader.start),
+              ALIGN_INTERVAL_MS
+            ))
+        );
+    }
   }
 
-  init() {
-    Watch.cb = this.props.cb;
-    clearInterval(Watch.interval);
-    Watch.interval = setInterval(() => this.send(), SEND_INTERVAL_MS);
+  setUrl(url: string) {}
+
+  align(start: number) {
+    this.send(start);
   }
 
-  send() {
-    firebase
-      .writeWatcher(getUsername()!, {
-        timestamp: Date.now(),
-        url: "",
-        progress: 0,
-        speed: 0,
-        state: 0,
-      })
-      .then(() => (Watch.cb ? Watch.cb() : null));
+  send(start: number) {
+    return firebase.writeWatcher(getUsername()!, {
+      start,
+      timestamp: Date.now(),
+      url: "",
+      progress: 0,
+      speed: 0,
+      state: 0,
+    });
   }
 
   render() {
