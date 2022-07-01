@@ -69,7 +69,7 @@ class Watch extends React.Component<PropsType, StateType> {
         this.send(Date.now());
       videoRef.current!.src = url;
     }).catch((err) => {
-      alert(err);
+      alert(err || "unknown error");
       throw err;
     });
   }
