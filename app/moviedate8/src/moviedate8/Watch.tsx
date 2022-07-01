@@ -3,7 +3,7 @@ import firebase, { StateEnum, WatcherType } from "./firebase";
 import css from "./index.module.css";
 import { getUsername } from "./User";
 
-const ALIGN_INTERVAL_MS = 1000;
+const ALIGN_INTERVAL_MS = 10000;
 const OFFSET_MS_CUTOFF_SMALL = 100;
 const OFFSET_MS_CUTOFF_BIG = 2000;
 
@@ -64,7 +64,8 @@ class Watch extends React.Component<PropsType, StateType> {
       videoRef.current!.onerror = () => {
         reject(videoRef.current!.error!.message);
       };
-      videoRef.current!.onchange = (event) => console.log(event);
+      // videoRef.current!.onplay = videoRef.current!.onpause = () =>
+      //   this.send(Date.now());
       videoRef.current!.src = url;
     }).catch((err) => {
       alert(err);

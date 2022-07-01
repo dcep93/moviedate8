@@ -1,9 +1,11 @@
 import React from "react";
-import { EverythingType, FirebaseWrapper } from "./firebase";
+import { EverythingType, FirebaseWrapper, WatchersType } from "./firebase";
 import Info from "./Info";
 import Lead from "./Lead";
 import User from "./User";
 import Watch from "./Watch";
+
+const OLD_WATCHER_CUTOFF_MS = 30000;
 
 class Home extends FirebaseWrapper<EverythingType, { lead?: boolean }> {
   getFirebasePath(): string {
@@ -12,24 +14,34 @@ class Home extends FirebaseWrapper<EverythingType, { lead?: boolean }> {
 
   render() {
     if (!this.state) return <>Loading...</>;
+    const everything = this.state.state || {};
     return (
       <SubHome
-        everything={this.state.state || {}}
         isLead={Boolean(this.props.lead)}
+        leader={everything.leader}
+        watchers={everything.watchers || {}}
       />
     );
   }
 }
 
-type SubHomePropsType = { isLead: boolean; everything: EverythingType };
+type SubHomePropsType = {
+  isLead: boolean;
+  leader: string;
+  watchers: WatchersType;
+};
 class SubHome extends React.Component<
   SubHomePropsType,
   { leaderProps?: { resolve: () => void; url: string } }
 > {
   render() {
-    const leader = (this.props.everything.watchers || {})[
-      this.props.everything.leader
-    ];
+    const now = Date.now();
+    const filteredWatchers = Object.fromEntries(
+      Object.entries(this.props.watchers).filter(
+        ([_, watcher]) => now - watcher.timestamp < OLD_WATCHER_CUTOFF_MS
+      )
+    );
+    const leader = filteredWatchers[this.props.leader];
     return (
       <div>
         {this.props.isLead && (
@@ -43,8 +55,8 @@ class SubHome extends React.Component<
             finishUpdate={() => this.setState({ leaderProps: undefined })}
           />
         )}
-        <User watchers={this.props.everything?.watchers || {}} />
-        <Info leader={leader} everything={this.props.everything} />
+        <User watchers={filteredWatchers} />
+        <Info leader={this.props.leader} watchers={filteredWatchers} />
         <Watch leader={leader} leaderProps={this.state?.leaderProps} />
       </div>
     );

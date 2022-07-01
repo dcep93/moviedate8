@@ -6,26 +6,29 @@ import {
   useParams,
 } from "react-router-dom";
 import Home from "./Home";
+import css from "./index.module.css";
 import Stream from "./Stream";
 
 function Main() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route
-          path={"/stream/:toStream"}
-          element={
-            <Routed
-              element={(params: Params) => (
-                <Stream rawToStream={params.toStream!} />
-              )}
-            />
-          }
-        />
-        <Route path={"/lead"} element={<Home lead={true} />} />
-        <Route index element={<Home />} />
-      </Routes>
-    </BrowserRouter>
+    <div className={css.main}>
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path={"/stream/:toStream"}
+            element={
+              <Routed
+                element={(params: Params) => (
+                  <Stream rawToStream={params.toStream!} />
+                )}
+              />
+            }
+          />
+          <Route path={"/lead"} element={<Home lead={true} />} />
+          <Route index element={<Home />} />
+        </Routes>
+      </BrowserRouter>
+    </div>
   );
 }
 
