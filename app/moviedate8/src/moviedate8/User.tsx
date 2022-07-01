@@ -24,7 +24,7 @@ function User(props: { watchers: WatchersType }) {
     localStorage.setItem(KEY, userName!);
   }
   return (
-    <>
+    <div>
       <div>{userName}</div>
       <button
         onClick={() => {
@@ -34,7 +34,7 @@ function User(props: { watchers: WatchersType }) {
       >
         Log Out
       </button>
-    </>
+    </div>
   );
 }
 

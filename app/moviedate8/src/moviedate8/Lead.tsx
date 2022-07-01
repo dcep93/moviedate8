@@ -9,7 +9,7 @@ function Lead(props: {
   finishUpdate: () => void;
 }) {
   return (
-    <>
+    <div>
       <form
         onSubmit={(e) =>
           Promise.resolve(e.preventDefault())
@@ -28,7 +28,7 @@ function Lead(props: {
         </div>
         <input type="submit" value="Submit" />
       </form>
-    </>
+    </div>
   );
 }
 

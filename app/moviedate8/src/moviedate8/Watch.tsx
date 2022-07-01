@@ -9,7 +9,7 @@ const videoRef = React.createRef<HTMLVideoElement>();
 type PropsType = {
   leader?: WatcherType;
   leaderProps?: {
-    cb: () => void;
+    resolve: () => void;
     url: string;
   };
 };
@@ -33,7 +33,7 @@ class Watch extends React.Component<PropsType, StateType> {
           .then(() => clearInterval(Watch.interval))
           .then(() => this.setUrl(this.props.leaderProps!.url))
           .then(() => this.send(Date.now()))
-          .then(this.props.leaderProps.cb);
+          .then(this.props.leaderProps.resolve);
       }
     } else if (leader && leader.start !== this.state?.start) {
       Promise.resolve()
@@ -68,7 +68,11 @@ class Watch extends React.Component<PropsType, StateType> {
   }
 
   render() {
-    return <video ref={videoRef} />;
+    return (
+      <div>
+        <video ref={videoRef} />
+      </div>
+    );
   }
 }
 
