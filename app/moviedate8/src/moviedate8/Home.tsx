@@ -41,12 +41,12 @@ class SubHome extends React.Component<
         ([_, watcher]) => now - watcher.timestamp < OLD_WATCHER_CUTOFF_MS
       )
     );
-    const leader = filteredWatchers[this.props.leader];
+    const leaderW = filteredWatchers[this.props.leader];
     return (
       <div>
         {this.props.isLead && (
           <Lead
-            url={leader?.url}
+            url={leaderW?.url}
             update={(url: string) =>
               new Promise((resolve, reject) =>
                 this.setState({ leaderProps: { resolve, url } })
@@ -57,7 +57,7 @@ class SubHome extends React.Component<
         )}
         <User watchers={filteredWatchers} />
         <Info leader={this.props.leader} watchers={filteredWatchers} />
-        <Watch leader={leader} leaderProps={this.state?.leaderProps} />
+        <Watch leaderW={leaderW} leaderProps={this.state?.leaderProps} />
       </div>
     );
   }

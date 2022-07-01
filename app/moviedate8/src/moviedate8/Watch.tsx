@@ -10,7 +10,7 @@ const OFFSET_MS_CUTOFF_BIG = 2000;
 const videoRef = React.createRef<HTMLVideoElement>();
 
 type PropsType = {
-  leader?: WatcherType;
+  leaderW?: WatcherType;
   leaderProps?: {
     resolve: () => void;
     url: string;
@@ -27,7 +27,7 @@ class Watch extends React.Component<PropsType, StateType> {
   }
 
   componentDidUpdate(prevProps: PropsType, prevState: StateType) {
-    const leader = this.props.leader;
+    const leaderW = this.props.leaderW;
     if (this.props.leaderProps) {
       if (!prevProps.leaderProps) {
         Promise.resolve()
@@ -36,12 +36,12 @@ class Watch extends React.Component<PropsType, StateType> {
           .then(() => this.send(Date.now()))
           .then(this.props.leaderProps.resolve);
       }
-    } else if (leader) {
-      if (leader.start !== this.state?.start) {
+    } else if (leaderW) {
+      if (leaderW.start !== this.state?.start) {
         Promise.resolve()
           .then(() => clearInterval(Watch.interval))
-          .then(() => this.setUrl(leader.url))
-          .then(() => this.setState({ start: leader.start }));
+          .then(() => this.setUrl(leaderW.url))
+          .then(() => this.setState({ start: leaderW.start }));
       } else if (this.state.start !== prevState?.start) {
         Promise.resolve()
           .then(() => clearInterval(Watch.interval))
@@ -87,7 +87,7 @@ class Watch extends React.Component<PropsType, StateType> {
   }
 
   align() {
-    const leader = this.props.leader!;
+    const leader = this.props.leaderW!;
     if (leader.user_name !== getUsername()) {
       const video = videoRef.current!;
       if (leader.state === StateEnum.paused) {
