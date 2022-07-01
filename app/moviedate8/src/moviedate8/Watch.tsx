@@ -22,9 +22,7 @@ type StateType = { start?: number };
 class Watch extends React.Component<PropsType, StateType> {
   static interval?: NodeJS.Timer;
 
-  constructor(props: PropsType) {
-    super(props);
-
+  componentDidMount() {
     this.componentDidUpdate({}, {});
   }
 
@@ -47,6 +45,7 @@ class Watch extends React.Component<PropsType, StateType> {
       } else if (this.state.start !== prevState?.start) {
         Promise.resolve()
           .then(() => clearInterval(Watch.interval))
+          .then(() => this.align())
           .then(
             () =>
               (Watch.interval = setInterval(
@@ -59,13 +58,14 @@ class Watch extends React.Component<PropsType, StateType> {
   }
 
   setUrl(url: string) {
+    if (videoRef.current!.src === url) return;
     return new Promise((resolve, reject) => {
       videoRef.current!.oncanplay = resolve;
       videoRef.current!.onerror = () => {
         reject(videoRef.current!.error!.message);
       };
-      // videoRef.current!.onplay = videoRef.current!.onpause = () =>
-      //   this.send(Date.now());
+      videoRef.current!.onplay = videoRef.current!.onpause = () =>
+        this.send(Date.now());
       videoRef.current!.src = url;
     }).catch((err) => {
       alert(err);
