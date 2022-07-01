@@ -10,7 +10,6 @@ import Lead from "./Lead";
 import Stream from "./Stream";
 
 function Main() {
-  document.title = "moviedate8";
   return (
     <BrowserRouter>
       <Routes>

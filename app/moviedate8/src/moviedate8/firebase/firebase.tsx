@@ -65,18 +65,12 @@ abstract class _FirebaseWrapper<T> extends React.Component<{}, { state: T }> {
     if (oldComponent) {
       this.setState(oldComponent.state);
     } else {
-      const title = this.getTitle();
-      if (title !== null) document.title = title;
       _connect(this.getFirebasePath(), (state) =>
         _FirebaseWrapper.firebaseWrapperComponent.setState.bind(
           _FirebaseWrapper.firebaseWrapperComponent
         )({ state })
       );
     }
-  }
-
-  getTitle(): string | null {
-    return null;
   }
 
   abstract getFirebasePath(): string;

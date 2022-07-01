@@ -6,16 +6,22 @@ export type LeadType = {};
 
 export type FollowType = {};
 
+export type AllFollowType = { [user_name: string]: FollowType };
+
 export type EverythingType = {
   lead?: LeadType;
-  follow?: { [k: string]: FollowType };
+  follow?: AllFollowType;
 };
 
-function write_lead(lead: LeadType) {
+function writeLead(lead: LeadType) {
   return firebase._set("/lead", lead);
 }
 
-const ex = { write_lead };
+function writeFollow(key: string, follow: FollowType) {
+  return firebase._set(`/follow/${key}`, follow);
+}
+
+const ex = { writeLead, writeFollow };
 
 export const FirebaseWrapper = firebase._FirebaseWrapper;
 
