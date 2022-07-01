@@ -1,4 +1,4 @@
-function Stream(props: { rawToStream: string }) {
+function Stream(props: { rawToStream?: string }) {
   return <>stream {props.rawToStream}</>;
 }
 
