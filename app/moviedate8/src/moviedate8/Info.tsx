@@ -38,11 +38,14 @@ class Info extends React.Component<{
 }
 
 function SubInfo(props: { w: WatcherType; url?: string | null }) {
-  const progress =
-    props.w.progress +
-    ((Date.now() - props.w.timestamp) *
-      (props.w.state === StateEnum.playing ? props.w.speed : 0)) /
-      1000;
+  const progress = !props.w
+    ? ""
+    : (
+        props.w.progress +
+        ((Date.now() - props.w.timestamp) *
+          (props.w.state === StateEnum.playing ? props.w.speed : 0)) /
+          1000
+      ).toFixed(2);
   return (
     <Link to={`/follow/${props.url === undefined ? "" : props.w.userName}`}>
       <div
@@ -55,7 +58,7 @@ function SubInfo(props: { w: WatcherType; url?: string | null }) {
         <div>
           {props.w.userName} {props.w.speed.toFixed(2)}x
         </div>
-        <div>{progress.toFixed(2)}</div>
+        <div>{progress}</div>
       </div>
     </Link>
   );
