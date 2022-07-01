@@ -1,5 +1,5 @@
 import React from "react";
-import firebase, { WatcherType } from "./firebase";
+import firebase, { StateEnum, WatcherType } from "./firebase";
 import { getUsername } from "./User";
 
 const ALIGN_INTERVAL_MS = 1000;
@@ -22,10 +22,10 @@ class Watch extends React.Component<PropsType, StateType> {
   constructor(props: PropsType) {
     super(props);
 
-    this.componentDidUpdate({});
+    this.componentDidUpdate({}, {});
   }
 
-  componentDidUpdate(prevProps: PropsType) {
+  componentDidUpdate(prevProps: PropsType, prevState: StateType) {
     const leader = this.props.leader;
     if (this.props.leaderProps) {
       if (!prevProps.leaderProps) {
@@ -35,36 +35,51 @@ class Watch extends React.Component<PropsType, StateType> {
           .then(() => this.send(Date.now()))
           .then(this.props.leaderProps.resolve);
       }
-    } else if (leader && leader.start !== this.state?.start) {
-      Promise.resolve()
-        .then(() => this.setState({ start: leader.start }))
-        .then(() => this.setUrl(leader.url))
-        .then(() => clearInterval(Watch.interval))
-        .then(
-          () =>
-            (Watch.interval = setInterval(
-              () => this.align(leader.start),
-              ALIGN_INTERVAL_MS
-            ))
-        );
+    } else if (leader) {
+      if (leader.start !== this.state?.start) {
+        Promise.resolve()
+          .then(() => clearInterval(Watch.interval))
+          .then(() => this.setUrl(leader.url))
+          .then(() => this.setState({ start: leader.start }));
+      } else if (this.state.start !== prevState?.start) {
+        Promise.resolve()
+          .then(() => clearInterval(Watch.interval))
+          .then(
+            () =>
+              (Watch.interval = setInterval(
+                () => this.align(),
+                ALIGN_INTERVAL_MS
+              ))
+          );
+      }
     }
   }
 
-  setUrl(url: string) {}
-
-  align(start: number) {
-    this.send(start);
+  setUrl(url: string) {
+    return new Promise((resolve, reject) => {
+      videoRef.current!.src = url;
+    });
   }
 
-  send(start: number) {
+  align() {
+    console.log("align", Date.now());
+    this.send();
+  }
+
+  send(start?: number) {
+    const state = this.getState();
     return firebase.writeWatcher(getUsername()!, {
-      start,
+      start: start || this.state.start!,
       timestamp: Date.now(),
-      url: "",
-      progress: 0,
-      speed: 0,
-      state: 0,
+      url: videoRef.current!.src,
+      progress: videoRef.current!.currentTime,
+      speed: videoRef.current!.playbackRate,
+      state,
     });
+  }
+
+  getState(): StateEnum {
+    return StateEnum.errored;
   }
 
   render() {
