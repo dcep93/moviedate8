@@ -13,11 +13,11 @@ type PropsType = {
   leaderW?: WatcherType;
   leaderProps?: {
     resolve: () => void;
-    url: string;
+    urls: string[];
   };
 };
 
-type StateType = { start?: number; opened?: boolean };
+type StateType = { start?: number; opened?: boolean; nextUrls?: string[] };
 
 class Watch extends React.Component<PropsType, StateType> {
   static interval?: NodeJS.Timer;
@@ -32,9 +32,14 @@ class Watch extends React.Component<PropsType, StateType> {
       if (!prevProps.leaderProps) {
         Promise.resolve()
           .then(() => clearInterval(Watch.interval))
-          .then(() => this.setUrl(this.props.leaderProps!.url))
+          .then(() => this.setUrl(this.props.leaderProps!.urls[0]))
+          .then(() =>
+            this.setState({
+              opened: true,
+              nextUrls: this.props.leaderProps!.urls.slice(1),
+            })
+          )
           .then(() => this.send(Date.now()))
-          .then(() => this.setState({ opened: true }))
           .then(this.props.leaderProps.resolve);
       }
     } else if (leaderW) {
@@ -67,6 +72,17 @@ class Watch extends React.Component<PropsType, StateType> {
       };
       videoRef.current!.onplay = videoRef.current!.onpause = () =>
         this.send(Date.now());
+      videoRef.current!.onended = () => {
+        if ((this.state?.nextUrls || []).length > 0) {
+          Promise.resolve()
+            .then(() => clearInterval(Watch.interval))
+            .then(() =>
+              this.setState({ nextUrls: this.state!.nextUrls!.slice(1) })
+            )
+            .then(() => this.setUrl(this.state!.nextUrls![0]))
+            .then(() => this.send(Date.now()));
+        }
+      };
       videoRef.current!.src = url;
     }).catch((err) => {
       alert(err || "unknown error");
@@ -136,7 +152,7 @@ class Watch extends React.Component<PropsType, StateType> {
         )}
         <video
           hidden={!this.state?.opened}
-          controls
+          controls={this.props.leaderW?.userName === getUsername()}
           className={css.video}
           ref={videoRef}
         />

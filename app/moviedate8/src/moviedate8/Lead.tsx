@@ -3,10 +3,12 @@ import firebase, { LibraryType, VideoType } from "./firebase";
 import { getUsername } from "./User";
 
 const urlRef = React.createRef<HTMLInputElement>();
+const selectRef = React.createRef<HTMLSelectElement>();
+
 function Lead(props: {
   library: LibraryType;
   url: string | undefined;
-  update: (url: string) => Promise<void>;
+  update: (urls: string[]) => Promise<void>;
   finishUpdate: () => void;
 }) {
   return (
@@ -14,7 +16,19 @@ function Lead(props: {
       <form
         onSubmit={(e) =>
           Promise.resolve(e.preventDefault())
-            .then(() => props.update(urlRef.current!.value))
+            .then(() => {
+              const current = urlRef.current!.value;
+              if (current) return [current];
+              if (selectRef.current!.selectedIndex === 0)
+                throw Error("no url selected");
+              const selected = selectRef.current!.selectedOptions[0];
+              const folder =
+                props.library[selected.getAttribute("data-folder")!];
+              return folder
+                .slice(parseInt(selected.getAttribute("data-index")!))
+                .map((v) => v.url!);
+            })
+            .then(props.update)
             .then(getUsername)
             .then(firebase.writeLeader)
             .then(props.finishUpdate)
@@ -26,7 +40,7 @@ function Lead(props: {
       >
         <div>
           Library:{" "}
-          <select>
+          <select ref={selectRef}>
             <option></option>
             {Object.entries(props.library)
               .flatMap(([folderName, videos]) =>
@@ -35,12 +49,13 @@ function Lead(props: {
                     url: undefined,
                     videoName: decodeURIComponent(folderName),
                     folderName,
-                  } as VideoType & { folderName: string },
+                  } as VideoType & { folderName: string; index: number },
                 ].concat(
-                  videos.map(({ videoName, url }) => ({
+                  videos.map(({ videoName, url }, index) => ({
                     folderName,
                     videoName,
                     url,
+                    index,
                   }))
                 )
               )
@@ -49,6 +64,7 @@ function Lead(props: {
                   disabled={obj.url === undefined}
                   key={obj.url || obj.videoName}
                   data-folder={obj.folderName}
+                  data-index={obj.index}
                 >
                   {obj.videoName}
                 </option>
