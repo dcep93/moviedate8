@@ -2,26 +2,36 @@
 
 import firebase from "./firebase";
 
-export type LeadType = {};
+export enum StateEnum {
+  loading,
+  playing,
+  paused,
+}
 
-export type FollowType = {};
-
-export type AllFollowType = { [user_name: string]: FollowType };
-
-export type EverythingType = {
-  lead?: LeadType;
-  follow?: AllFollowType;
+export type WatcherType = {
+  url: string;
+  progress: number;
+  timestamp: number;
+  speed: number;
+  state: StateEnum;
 };
 
-function writeLead(lead: LeadType) {
-  return firebase._set("/lead", lead);
+export type WatchersType = { [user_name: string]: WatcherType };
+
+export type EverythingType = {
+  leader: string;
+  watchers?: WatchersType;
+};
+
+function writeLeader(leader: string) {
+  return firebase._set("/leader", leader);
 }
 
-function writeFollow(key: string, follow: FollowType) {
-  return firebase._set(`/follow/${key}`, follow);
+function writeWatcher(userName: string, watcher: WatcherType) {
+  return firebase._set(`/watchers/${userName}`, watcher);
 }
 
-const ex = { writeLead, writeFollow };
+const ex = { writeLeader, writeWatcher };
 
 export const FirebaseWrapper = firebase._FirebaseWrapper;
 

@@ -57,8 +57,11 @@ function _delete(path: string): Promise<void> {
   return remove(ref(database, `${path}`));
 }
 
-abstract class _FirebaseWrapper<T> extends React.Component<{}, { state: T }> {
-  static firebaseWrapperComponent: _FirebaseWrapper<any>;
+abstract class _FirebaseWrapper<T, U = {}> extends React.Component<
+  U,
+  { state: T }
+> {
+  static firebaseWrapperComponent: _FirebaseWrapper<any, any>;
   componentDidMount() {
     const oldComponent = _FirebaseWrapper.firebaseWrapperComponent;
     _FirebaseWrapper.firebaseWrapperComponent = this;

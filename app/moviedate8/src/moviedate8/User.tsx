@@ -1,15 +1,15 @@
-import { AllFollowType } from "./firebase";
+import { WatchersType } from "./firebase";
 
 const KEY = "moviedate8/user";
 const ATTEMPTS = 3;
 
-function User(props: { allFollow: AllFollowType }) {
-  var userName = localStorage.getItem(KEY);
+function User(props: { watchers: WatchersType }) {
+  var userName = getUsername();
   if (userName === null) {
     for (let i = 0; i < ATTEMPTS; i++) {
       userName = prompt("enter your name");
       if (userName) {
-        if (!props.allFollow[userName]) break;
+        if (!props.watchers[userName]) break;
         alert(`${userName} is taken`);
       }
     }
@@ -18,7 +18,7 @@ function User(props: { allFollow: AllFollowType }) {
         userName = [...Array(8)]
           .map(() => Math.floor(Math.random() * 16).toString(16))
           .join("");
-        if (!props.allFollow[userName]) break;
+        if (!props.watchers[userName]) break;
       }
     }
     localStorage.setItem(KEY, userName!);
@@ -36,6 +36,10 @@ function User(props: { allFollow: AllFollowType }) {
       </button>
     </>
   );
+}
+
+export function getUsername(): string | null {
+  return localStorage.getItem(KEY);
 }
 
 export default User;

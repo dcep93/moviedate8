@@ -5,8 +5,7 @@ import {
   Routes,
   useParams,
 } from "react-router-dom";
-import Follow from "./Follow";
-import Lead from "./Lead";
+import Home from "./Home";
 import Stream from "./Stream";
 
 function Main() {
@@ -23,8 +22,8 @@ function Main() {
             />
           }
         />
-        <Route path={"/lead"} element={<Lead />} />
-        <Route index element={<Follow />} />
+        <Route path={"/lead"} element={<Home lead={true} />} />
+        <Route index element={<Home />} />
       </Routes>
     </BrowserRouter>
   );
