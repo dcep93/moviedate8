@@ -1,5 +1,3 @@
-// https://console.firebase.google.com/u/0/project/moviedate8/database/moviedate8-default-rtdb/data
-
 import { initializeApp } from "firebase/app"; // no compat for new SDK
 import {
   Database,
