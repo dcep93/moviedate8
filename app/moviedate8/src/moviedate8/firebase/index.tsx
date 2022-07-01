@@ -8,6 +8,7 @@ export enum StateEnum {
 }
 
 export type WatcherType = {
+  user_name: string;
   start: number;
   url: string;
   progress: number;

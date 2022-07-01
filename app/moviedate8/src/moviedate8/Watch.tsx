@@ -73,7 +73,9 @@ class Watch extends React.Component<PropsType, StateType> {
   }
 
   send(start?: number) {
-    return firebase.writeWatcher(getUsername()!, {
+    const user_name = getUsername()!;
+    return firebase.writeWatcher(user_name, {
+      user_name,
       start: start || this.state.start!,
       timestamp: Date.now(),
       url: videoRef.current!.src,
@@ -85,23 +87,25 @@ class Watch extends React.Component<PropsType, StateType> {
 
   align() {
     const leader = this.props.leader!;
-    const video = videoRef.current!;
-    if (leader.state === StateEnum.paused) {
-      if (!video.paused) video.pause();
-      video.currentTime = leader.progress;
-    } else {
-      if (video.paused) video.play();
-      const now = Date.now();
-      const leaderNormalizedTime = leader.progress * 1000 - leader.timestamp;
-      const myNormalizedTime = video.currentTime * 1000 - now;
-      const diffMs = leaderNormalizedTime - myNormalizedTime;
-      if (Math.abs(diffMs) < GRACE_SMALL_MS) {
-        video.playbackRate = leader.speed;
-      } else if (Math.abs(diffMs) < GRACE_BIG_MS) {
-        video.playbackRate = diffMs / ALIGN_INTERVAL_MS + leader.speed;
+    if (leader.user_name !== getUsername()) {
+      const video = videoRef.current!;
+      if (leader.state === StateEnum.paused) {
+        if (!video.paused) video.pause();
+        video.currentTime = leader.progress;
       } else {
-        video.currentTime = leader.progress + (now - leader.timestamp) / 1000;
-        video.playbackRate = leader.speed;
+        if (video.paused) video.play();
+        const now = Date.now();
+        const leaderNormalizedTime = leader.progress * 1000 - leader.timestamp;
+        const myNormalizedTime = video.currentTime * 1000 - now;
+        const diffMs = leaderNormalizedTime - myNormalizedTime;
+        if (Math.abs(diffMs) < GRACE_SMALL_MS) {
+          video.playbackRate = leader.speed;
+        } else if (Math.abs(diffMs) < GRACE_BIG_MS) {
+          video.playbackRate = diffMs / ALIGN_INTERVAL_MS + leader.speed;
+        } else {
+          video.currentTime = leader.progress + (now - leader.timestamp) / 1000;
+          video.playbackRate = leader.speed;
+        }
       }
     }
     this.send();
