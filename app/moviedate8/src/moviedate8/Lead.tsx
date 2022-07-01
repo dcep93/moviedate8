@@ -1,9 +1,10 @@
 import React from "react";
-import firebase from "./firebase";
+import firebase, { LibraryType } from "./firebase";
 import { getUsername } from "./User";
 
 const urlRef = React.createRef<HTMLInputElement>();
 function Lead(props: {
+  library: LibraryType;
   url: string | undefined;
   update: (url: string) => Promise<void>;
   finishUpdate: () => void;
@@ -23,6 +24,22 @@ function Lead(props: {
             })
         }
       >
+        <div>
+          Library:{" "}
+          <select>
+            {Object.entries(props.library)
+              .flatMap(([folder_name, videos]) =>
+                videos.map(({ video_name, url }) => ({
+                  folder_name,
+                  video_name,
+                  url,
+                }))
+              )
+              .map((obj) => (
+                <option>{obj.video_name}</option>
+              ))}
+          </select>
+        </div>
         <div>
           url: <input ref={urlRef} defaultValue={props.url} />
         </div>

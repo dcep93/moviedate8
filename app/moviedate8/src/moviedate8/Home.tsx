@@ -1,5 +1,5 @@
 import React from "react";
-import { EverythingType, FirebaseWrapper, WatchersType } from "./firebase";
+import { EverythingType, FirebaseWrapper } from "./firebase";
 import css from "./index.module.css";
 import Info from "./Info";
 import Lead from "./Lead";
@@ -18,25 +18,17 @@ class Home extends FirebaseWrapper<
 
   render() {
     if (!this.state) return <>Loading...</>;
-    const everything = this.state.state || {};
-    const leader =
+    const everything = { ...this.state.state } || {};
+    everything.leader =
       this.props.follow === undefined
         ? everything.leader
         : this.props.follow || undefined;
-    return (
-      <SubHome
-        isLead={Boolean(this.props.lead)}
-        leader={leader}
-        watchers={everything.watchers || {}}
-      />
-    );
+    return <SubHome {...everything} isLead={Boolean(this.props.lead)} />;
   }
 }
 
-type SubHomePropsType = {
+type SubHomePropsType = EverythingType & {
   isLead: boolean;
-  leader?: string;
-  watchers: WatchersType;
 };
 class SubHome extends React.Component<
   SubHomePropsType,
@@ -45,7 +37,7 @@ class SubHome extends React.Component<
   render() {
     const now = Date.now();
     const filteredWatchers = Object.fromEntries(
-      Object.entries(this.props.watchers).filter(
+      Object.entries(this.props.watchers || {}).filter(
         ([_, watcher]) => now - watcher.timestamp < OLD_WATCHER_CUTOFF_MS
       )
     );
@@ -58,6 +50,7 @@ class SubHome extends React.Component<
             <User watchers={filteredWatchers} />
             {this.props.isLead && (
               <Lead
+                library={this.props.library || {}}
                 url={leaderW?.url}
                 update={(url: string) =>
                   new Promise((resolve, reject) =>

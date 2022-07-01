@@ -19,9 +19,14 @@ export type WatcherType = {
 
 export type WatchersType = { [user_name: string]: WatcherType };
 
+export type LibraryType = {
+  [folder_name: string]: [{ video_name: string; url: string }];
+};
+
 export type EverythingType = {
-  leader: string;
+  leader?: string;
   watchers?: WatchersType;
+  library?: LibraryType;
 };
 
 function writeLeader(leader: string) {
