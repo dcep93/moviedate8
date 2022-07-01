@@ -13,7 +13,7 @@ import {
 } from "firebase/database";
 import React from "react";
 
-const project = "first2know";
+const project = "moviedate8";
 
 const config = {
   databaseURL: `https://${project}-default-rtdb.firebaseio.com/`,
