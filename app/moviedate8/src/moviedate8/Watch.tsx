@@ -3,7 +3,7 @@ import firebase, { StateEnum, WatcherType } from "./firebase";
 import css from "./index.module.css";
 import { getUsername } from "./User";
 
-const ALIGN_INTERVAL_MS = 10000;
+const ALIGN_INTERVAL_MS = 1000;
 const OFFSET_MS_CUTOFF_SMALL = 100;
 const OFFSET_MS_CUTOFF_BIG = 2000;
 
@@ -88,29 +88,39 @@ class Watch extends React.Component<PropsType, StateType> {
   }
 
   align() {
-    const leader = this.props.leaderW!;
-    if (leader.user_name !== getUsername()) {
-      const video = videoRef.current!;
-      if (leader.state === StateEnum.paused) {
-        if (!video.paused) video.pause();
-        video.currentTime = leader.progress;
-      } else {
-        if (video.paused) video.play();
-        const now = Date.now();
-        const leaderNormalizedTime = leader.progress * 1000 - leader.timestamp;
-        const myNormalizedTime = video.currentTime * 1000 - now;
-        const diffMs = leaderNormalizedTime - myNormalizedTime;
-        if (Math.abs(diffMs) < OFFSET_MS_CUTOFF_SMALL) {
-          video.playbackRate = leader.speed;
-        } else if (Math.abs(diffMs) < OFFSET_MS_CUTOFF_BIG) {
-          video.playbackRate = diffMs / ALIGN_INTERVAL_MS + leader.speed;
-        } else {
-          video.currentTime = leader.progress + (now - leader.timestamp) / 1000;
-          video.playbackRate = leader.speed;
+    Promise.resolve()
+      .then(() => {
+        const leader = this.props.leaderW!;
+        if (leader.user_name !== getUsername()) {
+          const video = videoRef.current!;
+          if (leader.state === StateEnum.paused) {
+            if (!video.paused) video.pause();
+            video.currentTime = leader.progress;
+          } else {
+            return Promise.resolve()
+              .then(() => (video.paused ? video.play() : null))
+              .then(() => {
+                if (video.paused) video.play();
+                const now = Date.now();
+                const leaderNormalizedTime =
+                  leader.progress * 1000 - leader.timestamp;
+                const myNormalizedTime = video.currentTime * 1000 - now;
+                const diffMs = leaderNormalizedTime - myNormalizedTime;
+                if (Math.abs(diffMs) < OFFSET_MS_CUTOFF_SMALL) {
+                  video.playbackRate = leader.speed;
+                } else if (Math.abs(diffMs) < OFFSET_MS_CUTOFF_BIG) {
+                  video.playbackRate =
+                    diffMs / ALIGN_INTERVAL_MS + leader.speed;
+                } else {
+                  video.currentTime =
+                    leader.progress + (now - leader.timestamp) / 1000;
+                  video.playbackRate = leader.speed;
+                }
+              });
+          }
         }
-      }
-    }
-    this.send();
+      })
+      .then(() => this.send());
   }
 
   render() {
