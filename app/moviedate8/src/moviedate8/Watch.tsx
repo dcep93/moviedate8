@@ -17,7 +17,7 @@ type PropsType = {
   };
 };
 
-type StateType = { start?: number };
+type StateType = { start?: number; opened?: boolean };
 
 class Watch extends React.Component<PropsType, StateType> {
   static interval?: NodeJS.Timer;
@@ -34,15 +34,16 @@ class Watch extends React.Component<PropsType, StateType> {
           .then(() => clearInterval(Watch.interval))
           .then(() => this.setUrl(this.props.leaderProps!.url))
           .then(() => this.send(Date.now()))
+          .then(() => this.setState({ opened: true }))
           .then(this.props.leaderProps.resolve);
       }
     } else if (leaderW) {
-      if (leaderW.start !== this.state?.start) {
+      if (this.state?.opened && leaderW.start !== this.state?.start) {
         Promise.resolve()
           .then(() => clearInterval(Watch.interval))
           .then(() => this.setUrl(leaderW.url))
           .then(() => this.setState({ start: leaderW.start }));
-      } else if (this.state.start !== prevState?.start) {
+      } else if (this.state?.start !== prevState?.start) {
         Promise.resolve()
           .then(() => clearInterval(Watch.interval))
           .then(() => this.align())
@@ -115,7 +116,17 @@ class Watch extends React.Component<PropsType, StateType> {
   render() {
     return (
       <div>
-        <video controls className={css.video} ref={videoRef} />
+        {!this.state?.opened && (
+          <button onClick={() => this.setState({ opened: true })}>
+            Open Video Player
+          </button>
+        )}
+        <video
+          hidden={!this.state?.opened}
+          controls
+          className={css.video}
+          ref={videoRef}
+        />
       </div>
     );
   }
