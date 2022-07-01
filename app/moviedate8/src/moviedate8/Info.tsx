@@ -18,8 +18,8 @@ class Info extends React.Component<{
   render() {
     const leaderW = this.props.watchers[this.props.leader!];
     const sortedNonLeaders = Object.values(this.props.watchers)
-      .filter((w) => w.user_name !== this.props.leader)
-      .sort((a, b) => (a.user_name < b.user_name ? -1 : 1));
+      .filter((w) => w.userName !== this.props.leader)
+      .sort((a, b) => (a.userName < b.userName ? -1 : 1));
     return (
       <div className={css.inline}>
         {leaderW && (
@@ -29,7 +29,7 @@ class Info extends React.Component<{
         )}
         <div>
           {sortedNonLeaders.map((w) => (
-            <SubInfo key={w.user_name} w={w} url={leaderW?.url || null} />
+            <SubInfo key={w.userName} w={w} url={leaderW?.url || null} />
           ))}
         </div>
       </div>
@@ -44,7 +44,7 @@ function SubInfo(props: { w: WatcherType; url?: string | null }) {
       (props.w.state === StateEnum.playing ? props.w.speed : 0)) /
       1000;
   return (
-    <Link to={`/follow/${props.url === undefined ? "" : props.w.user_name}`}>
+    <Link to={`/follow/${props.url === undefined ? "" : props.w.userName}`}>
       <div
         title={JSON.stringify(props, null, 2)}
         className={[
@@ -53,7 +53,7 @@ function SubInfo(props: { w: WatcherType; url?: string | null }) {
         ].join(" ")}
       >
         <div>
-          {props.w.user_name} {props.w.speed.toFixed(2)}x
+          {props.w.userName} {props.w.speed.toFixed(2)}x
         </div>
         <div>{progress.toFixed(2)}</div>
       </div>

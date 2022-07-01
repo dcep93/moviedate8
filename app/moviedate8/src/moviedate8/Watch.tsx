@@ -75,9 +75,9 @@ class Watch extends React.Component<PropsType, StateType> {
   }
 
   send(start?: number) {
-    const user_name = getUsername()!;
-    return firebase.writeWatcher(user_name, {
-      user_name,
+    const userName = getUsername()!;
+    return firebase.writeWatcher(userName, {
+      userName,
       start: start || this.state.start!,
       timestamp: Date.now(),
       url: videoRef.current!.src,
@@ -91,7 +91,7 @@ class Watch extends React.Component<PropsType, StateType> {
     Promise.resolve()
       .then(() => {
         const leader = this.props.leaderW!;
-        if (leader && leader.user_name !== getUsername()) {
+        if (leader && leader.userName !== getUsername()) {
           const video = videoRef.current!;
           if (leader.state === StateEnum.paused) {
             if (!video.paused) video.pause();
