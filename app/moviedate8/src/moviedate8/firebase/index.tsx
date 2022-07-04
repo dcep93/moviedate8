@@ -59,6 +59,7 @@ function getFolderFromSeedr() {
         folderName: encodeURIComponent(document.title),
       }))
       .then((obj) => JSON.stringify(obj))
+      .then((json) => `ex.writeLibraryFromJSON(${json})`)
       .then(console.log);
   }
   console.log(`(${f})()`);
