@@ -24,7 +24,7 @@ function Main() {
               />
             }
           />
-          <Route path={"/stream/"} element={<Stream />} />
+          <Route path={"/stream"} element={<Stream />} />
           <Route path={"/follow"} element={<Home follow={null} />} />
           <Route
             path={"/follow/:follow"}
