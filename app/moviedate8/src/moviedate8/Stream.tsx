@@ -10,12 +10,14 @@ class Stream extends FirebaseWrapper<LibraryType, { rawToStream?: string }> {
 
   render() {
     if (!this.state) return <>Loading...</>;
+    const rawToStream =
+      this.state.state[this.props.rawToStream || ""]
+        ?.map(({ url }) => url)
+        ?.join(",") || this.props.rawToStream;
     return (
       <SubStream
         library={this.state.state}
-        toStream={(this.props.rawToStream || "")
-          .split(",")
-          .filter((s) => s !== "")}
+        toStream={(rawToStream || "").split(",").filter((s) => s !== "")}
       />
     );
   }
