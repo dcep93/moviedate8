@@ -15,7 +15,7 @@ function Main() {
       <BrowserRouter>
         <Routes>
           <Route
-            path={"/stream/:stream"}
+            path={"/stream/:stream+"}
             element={
               <Routed
                 elementF={(params: Params) => (
