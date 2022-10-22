@@ -17,7 +17,11 @@ class Stream extends FirebaseWrapper<LibraryType, { rawToStream?: string }> {
 
 function SubStream(props: { library: LibraryType }) {
   const [searchParams] = useSearchParams();
-  const toStream = searchParams.get("s")?.split(",") || [];
+  const rawToStream = searchParams.get("s");
+  const toStream =
+    props.library[rawToStream || ""]?.map(({ url }) => url) ||
+    rawToStream?.split(",") ||
+    [];
   const [urls, update] = useState(toStream);
   return (
     <>
