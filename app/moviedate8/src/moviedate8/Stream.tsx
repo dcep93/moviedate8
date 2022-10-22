@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { FirebaseWrapper, LibraryType } from "./firebase";
 import css from "./index.module.css";
 import Selector from "./Selector";
@@ -10,21 +11,14 @@ class Stream extends FirebaseWrapper<LibraryType, { rawToStream?: string }> {
 
   render() {
     if (!this.state) return <>Loading...</>;
-    const rawToStream =
-      this.state.state[this.props.rawToStream || ""]
-        ?.map(({ url }) => url)
-        ?.join(",") || this.props.rawToStream;
-    return (
-      <SubStream
-        library={this.state.state}
-        toStream={(rawToStream || "").split(",").filter((s) => s !== "")}
-      />
-    );
+    return <SubStream library={this.state.state} />;
   }
 }
 
-function SubStream(props: { library: LibraryType; toStream: string[] }) {
-  const [urls, update] = useState(props.toStream);
+function SubStream(props: { library: LibraryType }) {
+  const [searchParams] = useSearchParams();
+  const toStream = searchParams.get("s")?.split(",") || [];
+  const [urls, update] = useState(toStream);
   return (
     <>
       <Player url={urls[0]} onEnded={() => update(urls.slice(1))} />{" "}
