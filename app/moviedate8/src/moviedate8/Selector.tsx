@@ -1,8 +1,9 @@
 import React from "react";
-import { LibraryType, VideoType } from "./firebase";
+import firebase, { LibraryType, VideoType } from "./firebase";
 import css from "./index.module.css";
 
 const urlRef = React.createRef<HTMLInputElement>();
+const folderRef = React.createRef<HTMLInputElement>();
 const selectRef = React.createRef<HTMLSelectElement>();
 
 function Selector(props: {
@@ -17,12 +18,19 @@ function Selector(props: {
           Promise.resolve(e.preventDefault())
             .then(() => {
               const current = urlRef.current!.value;
-              if (current) return [current];
+              if (current) {
+                const folder = folderRef.current!.value;
+                if (folder) {
+                  firebase.appendToFolder(folder, current);
+                }
+                return [current];
+              }
               if (selectRef.current!.selectedIndex === 0)
                 throw Error("no url selected");
               const selected = selectRef.current!.selectedOptions[0];
-              const folder =
-                props.library[selected.getAttribute("data-folder")!];
+              const folder = Object.values(
+                props.library[selected.getAttribute("data-folder")!]
+              );
               return folder
                 .slice(parseInt(selected.getAttribute("data-index")!))
                 .map((v) => v.url!);
@@ -51,7 +59,7 @@ function Selector(props: {
                     folderName,
                   } as VideoType & { folderName: string; index: number },
                 ].concat(
-                  videos.map(({ videoName, url }, index) => ({
+                  Object.values(videos).map(({ videoName, url }, index) => ({
                     folderName,
                     videoName,
                     url,
@@ -70,6 +78,9 @@ function Selector(props: {
                 </option>
               ))}
           </select>
+        </div>
+        <div>
+          folder: <input ref={folderRef} />
         </div>
         <div>
           url:{" "}

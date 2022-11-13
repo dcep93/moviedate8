@@ -19,7 +19,9 @@ function SubStream(props: { library: LibraryType }) {
   const [searchParams] = useSearchParams();
   const rawToStream = searchParams.get("s");
   const toStream =
-    props.library[rawToStream || ""]?.map(({ url }) => url) ||
+    Object.values(props.library[rawToStream || ""] || {}).map(
+      ({ url }) => url
+    ) ||
     rawToStream?.split(",") ||
     [];
   const [urls, update] = useState(toStream);

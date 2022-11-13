@@ -22,7 +22,7 @@ export type WatchersType = { [userName: string]: WatcherType };
 export type VideoType = { videoName: string; url?: string };
 
 export type LibraryType = {
-  [folderName: string]: VideoType[];
+  [folderName: string]: { [key: string]: VideoType };
 };
 
 export type EverythingType = {
@@ -39,42 +39,17 @@ function writeWatcher(userName: string, watcher: WatcherType) {
   return firebase._set(`/watchers/${userName}`, watcher);
 }
 
-function writeLibrary(folderName: string, videos: VideoType[]) {
-  return firebase._set(`/library/${folderName}`, videos);
-}
-
-function getFolderFromSeedr() {
-  function f() {
-    Promise.all(
-      Array.from(document.getElementsByClassName("file")).map((el) =>
-        fetch(
-          `https://www.seedr.cc/download/file/${el.getAttribute("data-id")}/url`
-        )
-          .then((resp) => resp.json())
-          .then((j) => ({ videoName: j.name, url: j.url }))
-      )
-    )
-      .then((videos) => ({
-        videos,
-        folderName: encodeURIComponent(document.title),
-      }))
-      .then((obj) => JSON.stringify(obj))
-      .then((json) => `ex.writeLibraryFromJSON(${json})`)
-      .then(console.log);
-  }
-  console.log(`(${f})()`);
-}
-
-function writeLibraryFromJSON(j: string) {
-  const parts = JSON.parse(j);
-  return writeLibrary(parts.folderName, parts.videos);
+function appendToFolder(folder: string, url: string) {
+  return firebase._push(`/library/${folder}`, {
+    videoName: url.split("/").reverse()[0].split("?")[0],
+    url,
+  });
 }
 
 const ex = {
-  writeLibraryFromJSON,
-  getFolderFromSeedr,
   writeLeader,
   writeWatcher,
+  appendToFolder,
 };
 
 declare global {
