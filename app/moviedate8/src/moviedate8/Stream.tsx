@@ -4,14 +4,17 @@ import { FirebaseWrapper, LibraryType } from "./firebase";
 import css from "./index.module.css";
 import Selector from "./Selector";
 
-class Stream extends FirebaseWrapper<LibraryType, { rawToStream?: string }> {
+class Stream extends FirebaseWrapper<
+  LibraryType | undefined,
+  { rawToStream?: string }
+> {
   getFirebasePath(): string {
     return "/library";
   }
 
   render() {
     if (!this.state) return <>Loading...</>;
-    return <SubStream library={this.state.state} />;
+    return <SubStream library={this.state.state || {}} />;
   }
 }
 
