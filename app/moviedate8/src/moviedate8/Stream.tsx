@@ -57,7 +57,10 @@ function Player(props: { url: string | undefined; onEnded: () => void }) {
       controls
       className={css.video}
       src={props.url}
-      onClick={() => window.open(`vlc://${props.url}`)}
+      onError={(e) => {
+        alert((e.target as HTMLMediaElement).error!.message);
+        window.open(`vlc://${props.url}`);
+      }}
       onCanPlay={(e) => e.currentTarget.play()}
       onEnded={props.onEnded}
     />
