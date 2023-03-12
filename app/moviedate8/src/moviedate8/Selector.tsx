@@ -35,6 +35,10 @@ function Selector(props: {
                 .slice(parseInt(selected.getAttribute("data-index")!))
                 .map((v) => v.url!);
             })
+            .then((urls) => {
+              urlRef.current!.value = urls[0];
+              return urls;
+            })
             .then(props.submit)
             .catch((err) => {
               alert(err);
