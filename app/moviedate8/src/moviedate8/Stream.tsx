@@ -57,6 +57,7 @@ function Player(props: { url: string | undefined; onEnded: () => void }) {
       controls
       className={css.video}
       src={props.url}
+      onClick={() => alert("gotem")}
       onCanPlay={(e) => e.currentTarget.play()}
       onEnded={props.onEnded}
     />
