@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import Selector from "./Selector";
 import { FirebaseWrapper, LibraryType } from "./firebase";
 import css from "./index.module.css";
-import Selector from "./Selector";
 
 class Stream extends FirebaseWrapper<
   LibraryType | undefined,
@@ -58,7 +58,7 @@ function Player(props: { url: string | undefined; onEnded: () => void }) {
       className={css.video}
       src={props.url}
       onError={(e) => {
-        alert((e.target as HTMLMediaElement).error!.message);
+        alert(`error: ${(e.target as HTMLMediaElement).error!.message}`);
         window.open(`vlc://${props.url}`);
       }}
       onCanPlay={(e) => e.currentTarget.play()}
