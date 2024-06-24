@@ -40,4 +40,3 @@ cat <<EOF >.firebaserc
 EOF
 
 firebase deploy --project "$project_id"
-firebase deploy --project movied8
