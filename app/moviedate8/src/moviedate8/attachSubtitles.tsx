@@ -4,7 +4,7 @@ export default function attachSubtitles(
   element: HTMLVideoElement,
   subtitlesUrl: string
 ) {
-  proxyFetchText(subtitlesUrl, 0).then((text) => {
+  proxyFetchText(subtitlesUrl, 24 * 60 * 60 * 1000).then((text) => {
     const track = element.addTextTrack("captions", "English", "en");
     track.mode = "showing";
 
@@ -31,7 +31,6 @@ function subtitleParseTimestamp(s: string): number {
 }
 
 function subtitleParser(text: string): VTTCue[] {
-  console.log(text);
   var lines = text
     .trim()
     .replace(/\r+\n/g, "\n")
@@ -46,7 +45,7 @@ function subtitleParser(text: string): VTTCue[] {
   lines.forEach((line) => {
     if (line.indexOf("-->") >= 0) {
       var splitted = line.split(/[ \t]+-->[ \t]+/);
-      if (splitted.length != 2) {
+      if (splitted.length !== 2) {
         throw new Error('Error when splitting "-->": ' + line);
       }
 
