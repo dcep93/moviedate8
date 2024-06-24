@@ -6,8 +6,9 @@ import {
   useParams,
 } from "react-router-dom";
 import Home from "./Home";
-import css from "./index.module.css";
+import Link from "./Link";
 import Stream from "./Stream";
+import css from "./index.module.css";
 
 function Main() {
   return (
@@ -25,6 +26,7 @@ function Main() {
             }
           />
           <Route path={"/lead"} element={<Home lead />} />
+          <Route path={"/link"} element={<Link />} />
           <Route index element={<Home />} />
         </Routes>
       </BrowserRouter>
