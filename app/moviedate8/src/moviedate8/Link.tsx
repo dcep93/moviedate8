@@ -1,5 +1,5 @@
 const URL =
-  "https://de25.seedr.cc/ff_get_premium/5452648787/Friday.the.13th.1980.720p.BluRay.x264.YIFY.mp4?st=pPFHh_78Y4a9_Yi5npDsrA&e=1719255536https://nw4.seedr.cc/ff_get_premium/5452650545/The.Cable.Guy.1996.1080p.BluRay.x264-[YTS.AM].mp4?st=6i6K6TV03MRhXd7jvjWvcw&e=1719255759";
+  "https://rs9.seedr.cc/ff_get_premium/5453374179/The.Equalizer.2.2018.1080p.BluRay.x264-[YTS.AM].mp4?st=at6x8dcVtfEdLZfCgJIjDg&e=1719374487";
 
 export default function Link() {
   return (
