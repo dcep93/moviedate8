@@ -11,6 +11,7 @@ SA_KEY="$1"
 # cat gac.json
 
 cd app/moviedate8
+# alias movied8.web.app
 
 export GOOGLE_APPLICATION_CREDENTIALS="gac.json"
 echo "$SA_KEY" >"$GOOGLE_APPLICATION_CREDENTIALS"
