@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Selector from "./Selector";
+import attachSubtitles, { attachSubtitlesString } from "./attachSubtitles";
 import { FirebaseWrapper, LibraryType } from "./firebase";
 import css from "./index.module.css";
 
@@ -28,10 +29,21 @@ function SubStream(props: { library: LibraryType }) {
     rawToStream?.split(",") ||
     [];
   const [urls, update] = useState(toStream);
+  const [subtitlesString, updateSubtitlesString] = useState<
+    string | undefined
+  >();
   return (
     <>
-      <Player url={urls[0]} onEnded={() => update(urls.slice(1))} />{" "}
-      <Menu library={props.library} update={update} />
+      <Player
+        url={urls[0]}
+        subtitlesString={subtitlesString}
+        onEnded={() => update(urls.slice(1))}
+      />{" "}
+      <Menu
+        library={props.library}
+        update={update}
+        updateSubtitlesString={updateSubtitlesString}
+      />
     </>
   );
 }
@@ -39,6 +51,7 @@ function SubStream(props: { library: LibraryType }) {
 function Menu(props: {
   library: LibraryType;
   update: (urls: string[]) => void;
+  updateSubtitlesString: (subtitlesString: string) => void;
 }) {
   return (
     <div className={css.padding}>
@@ -46,22 +59,43 @@ function Menu(props: {
         defaultUrl={""}
         library={props.library}
         submit={(urls) => Promise.resolve(urls).then(props.update)}
+        updateSubtitlesString={props.updateSubtitlesString}
       />
     </div>
   );
 }
 
-function Player(props: { url: string | undefined; onEnded: () => void }) {
+function Player(props: {
+  subtitlesString: string | undefined;
+  url: string | undefined;
+  onEnded: () => void;
+}) {
+  const urlParts = props.url?.split("&subs=");
   return (
     <video
       controls
       className={css.video}
-      src={props.url}
+      src={urlParts?.[0]}
       onError={(e) => {
         alert(`error: ${(e.target as HTMLMediaElement).error!.message}`);
         window.open(`vlc://${props.url}`);
       }}
-      onCanPlay={(e) => e.currentTarget.play()}
+      onCanPlay={(e) =>
+        Promise.resolve({
+          e: e.target as HTMLVideoElement,
+          subtitlesUrl: urlParts?.[1],
+        }).then(({ e, subtitlesUrl }) =>
+          Promise.resolve()
+            .then(() =>
+              props.subtitlesString !== undefined
+                ? attachSubtitlesString(e, props.subtitlesString)
+                : subtitlesUrl
+                ? attachSubtitles(e, subtitlesUrl)
+                : null
+            )
+            .then(() => e.play())
+        )
+      }
       onEnded={props.onEnded}
     />
   );

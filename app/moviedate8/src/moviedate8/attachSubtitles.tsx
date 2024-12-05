@@ -4,12 +4,19 @@ export default function attachSubtitles(
   element: HTMLVideoElement,
   subtitlesUrl: string
 ) {
-  proxyFetchText(subtitlesUrl, 24 * 60 * 60 * 1000).then((text) => {
-    const track = element.addTextTrack("captions", "English", "en");
-    track.mode = "showing";
+  return proxyFetchText(subtitlesUrl, 24 * 60 * 60 * 1000).then((text) =>
+    attachSubtitlesString(element, text)
+  );
+}
 
-    subtitleParser(text).forEach(track.addCue.bind(track));
-  });
+export function attachSubtitlesString(
+  element: HTMLVideoElement,
+  subtitlesString: string
+) {
+  const track = element.addTextTrack("captions", "English", "en");
+  track.mode = "showing";
+
+  subtitleParser(subtitlesString).forEach(track.addCue.bind(track));
 }
 
 // https://gist.github.com/denilsonsa/aeb06c662cf98e29c379

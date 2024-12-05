@@ -10,6 +10,7 @@ function Selector(props: {
   defaultUrl: string | undefined;
   library: LibraryType;
   submit: (urls: string[]) => void;
+  updateSubtitlesString?: (subtitlesString: string) => void;
 }) {
   return (
     <div>
@@ -94,6 +95,25 @@ function Selector(props: {
             defaultValue={props.defaultUrl}
           />
         </div>
+        {props.updateSubtitlesString === undefined ? null : (
+          <div>
+            Subtitles:{" "}
+            <input
+              onChange={(event) => {
+                if (!event.target.files) return;
+                const fileReader = new FileReader();
+                fileReader.onloadend = (ee) => {
+                  alert(
+                    `read subtitles ${(fileReader.result as string).length}`
+                  );
+                  props.updateSubtitlesString!(fileReader.result as string);
+                };
+                fileReader.readAsText(event.target.files[0]);
+              }}
+              type={"file"}
+            />
+          </div>
+        )}
         <input type="submit" value="Submit" />
       </form>
     </div>
