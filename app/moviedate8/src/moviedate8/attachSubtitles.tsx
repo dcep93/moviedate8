@@ -13,6 +13,9 @@ export function attachSubtitlesString(
   element: HTMLVideoElement,
   subtitlesString: string
 ) {
+  Array.from(element.textTracks).forEach((track) => {
+    track.mode = "disabled";
+  });
   const track = element.addTextTrack("captions", "English", "en");
   track.mode = "showing";
 
