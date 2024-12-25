@@ -16,8 +16,7 @@ export default function Link() {
 function Video(props: { url: string; subtitlesUrl?: string }) {
   const ref = createRef<HTMLVideoElement>();
   const subtitlesUrl =
-    props.subtitlesUrl ||
-    new URLSearchParams(window.location.search).get("subs");
+    props.subtitlesUrl || window.location.href.split("subs=")[1];
   return (
     <video
       ref={ref}
