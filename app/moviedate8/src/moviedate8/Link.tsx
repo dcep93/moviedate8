@@ -8,13 +8,16 @@ export default function Link() {
   return (
     <Video
       url={URL}
-      // subtitlesUrl="https://my-subs.co/download/film-623559.srt"
+      // subtitlesUrl="https://nw30.seedr.cc/ff_get_premium/5568410136/English.srt?st=mDFkzpF4VhxOpaS_Yx0vNg&e=1735272170"
     />
   );
 }
 
 function Video(props: { url: string; subtitlesUrl?: string }) {
   const ref = createRef<HTMLVideoElement>();
+  const subtitlesUrl =
+    props.subtitlesUrl ||
+    new URLSearchParams(window.location.search).get("subs");
   return (
     <video
       ref={ref}
@@ -22,7 +25,7 @@ function Video(props: { url: string; subtitlesUrl?: string }) {
       controls
       onError={(e) => alert(`error: ${JSON.stringify(e)}`)}
       onCanPlay={() =>
-        props.subtitlesUrl && attachSubtitles(ref.current!, props.subtitlesUrl)
+        subtitlesUrl && attachSubtitles(ref.current!, subtitlesUrl)
       }
       src={props.url}
     />
