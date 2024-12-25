@@ -2,7 +2,7 @@ import { createRef } from "react";
 import attachSubtitles from "./attachSubtitles";
 
 const URL =
-  "https://rs16.seedr.cc/ff_get_premium/5568409521/Y2K.2024.720p.WEB.H264-SLOT.mkv?st=WjyTx3fUObLRGCiGXPe8Jg&e=1735271943";
+  "https://rs12.seedr.cc/ff_get_premium/5568410140/Y2K.2024.1080p.WEBRip.x264.AAC5.1-LAMA.mp4?st=Dj5UcQMrjtH6nAcP6ngibg&e=1735272131";
 
 export default function Link() {
   return (
