@@ -2,13 +2,13 @@ import { createRef } from "react";
 import attachSubtitles from "./attachSubtitles";
 
 const URL =
-  "https://nw4.seedr.cc/ff_get_premium/5452650545/The.Cable.Guy.1996.1080p.BluRay.x264-[YTS.AM].mp4?st=y7_jhHlE5REmDUW_sDNFxg&e=1719385961";
+  "https://rs16.seedr.cc/ff_get_premium/5568409521/Y2K.2024.720p.WEB.H264-SLOT.mkv?st=WjyTx3fUObLRGCiGXPe8Jg&e=1735271943";
 
 export default function Link() {
   return (
     <Video
       url={URL}
-      subtitlesUrl="https://my-subs.co/download/film-623559.srt"
+      // subtitlesUrl="https://my-subs.co/download/film-623559.srt"
     />
   );
 }
