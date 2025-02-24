@@ -27,7 +27,7 @@ function Main() {
           />
           <Route path={"/lead"} element={<Home lead />} />
           <Route path={"/link"} element={<Link />} />
-          <Route index element={<Home />} />
+          <Route index element={<Stream />} />
         </Routes>
       </BrowserRouter>
     </div>

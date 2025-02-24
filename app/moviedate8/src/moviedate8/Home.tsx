@@ -18,7 +18,7 @@ class Home extends FirebaseWrapper<
 
   render() {
     if (!this.state) return <>Loading...</>;
-    const everything = { ...this.state.state } || {};
+    const everything = { ...this.state.state };
     everything.leader =
       this.props.follow === undefined
         ? everything.leader

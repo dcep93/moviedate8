@@ -78,7 +78,7 @@ function Player(props: {
       src={urlParts?.[0]}
       onError={(e) => {
         alert(`error: ${(e.target as HTMLMediaElement).error!.message}`);
-        window.open(`vlc://${props.url}`);
+        // window.open(`vlc://${props.url}`);
       }}
       onCanPlay={(e) =>
         Promise.resolve({
