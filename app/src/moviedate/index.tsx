@@ -1,3 +1,14 @@
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import Root from "./Root";
+import Static from "./Static";
+
 export default function Moviedate() {
-  return <div>asdf</div>;
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Root />} />
+        <Route path="/s" element={<Static />} />
+      </Routes>
+    </Router>
+  );
 }
