@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Chromecast from "./Chromecast";
 
 export type LibraryValue = { src: string; subs?: string };
@@ -8,8 +8,12 @@ export type PlayerConfig = LibraryValue & {};
 export default function Player(playerConfig: PlayerConfig) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  useEffect(() => Chromecast.initializeScript, []);
-  useEffect(() => Chromecast.initializeVideo(videoRef), [videoRef]);
+  const [chromecastInitialized, setChromecastInitialized] = useState(false);
+  useEffect(() => Chromecast.initializeScript(setChromecastInitialized), []);
+  useEffect(
+    () => void (chromecastInitialized && Chromecast.initializeVideo(videoRef)),
+    [chromecastInitialized, videoRef],
+  );
 
   return (
     <div>
