@@ -1,6 +1,5 @@
 import {
   useEffect,
-  useState,
   type DetailedHTMLProps,
   type HTMLAttributes,
   type RefObject,
@@ -11,18 +10,7 @@ export default function Chromecast({
 }: {
   videoRef: RefObject<HTMLVideoElement | null>;
 }) {
-  const [chromecastInitialized, setChromecastInitialized] = useState(false);
-  useEffect(
-    () =>
-      void (
-        !chromecastInitialized && initializeScript(setChromecastInitialized)
-      ),
-    [],
-  );
-  useEffect(
-    () => void (chromecastInitialized && initializeVideo(videoRef)),
-    [chromecastInitialized, videoRef],
-  );
+  useEffect(() => void initializeScript(videoRef), [videoRef]);
   return (
     <google-cast-launcher
       style={{
@@ -110,7 +98,7 @@ declare const chrome: {
   };
 };
 
-declare global {
+declare module "react/jsx-runtime" {
   namespace JSX {
     interface IntrinsicElements {
       "google-cast-launcher": DetailedHTMLProps<
@@ -121,9 +109,7 @@ declare global {
   }
 }
 
-const initializeScript = (
-  setChromecastInitialized: (chromecastInitialized: boolean) => void,
-) => {
+const initializeScript = (videoRef: RefObject<HTMLVideoElement | null>) => {
   const script = document.createElement("script");
   script.src =
     "https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1";
@@ -138,7 +124,7 @@ const initializeScript = (
         autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED,
       });
     }
-    setChromecastInitialized(true);
+    initializeVideo(videoRef);
   };
 };
 
