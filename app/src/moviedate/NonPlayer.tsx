@@ -20,15 +20,18 @@ export default function NonPlayer({
   const pathInputRef = useRef<HTMLInputElement>(null);
   const srcInputRef = useRef<HTMLInputElement>(null);
   const subsInputRef = useRef<HTMLInputElement>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
   function submit() {
     const path = pathInputRef.current?.value;
     const src = srcInputRef.current?.value;
     const subs = subsInputRef.current?.value;
-    if (path && src) {
-      _firebase._set(libraryPath(path), !subs ? { src } : { src, subs });
+    if (path) {
+      searchParams.set(K_QUERY_PARAM, path);
+      if (src) {
+        _firebase._set(libraryPath(path), !subs ? { src } : { src, subs });
+      }
     }
   }
-  const [searchParams, setSearchParams] = useSearchParams();
   const key = searchParams.get(K_QUERY_PARAM);
   const libraryConfig = data?.library?.[key ?? ""];
   useEffect(() => {
