@@ -1,6 +1,6 @@
 import { useState } from "react";
 import _firebase from "./_firebase";
-import Library, { type LibraryType } from "./Library";
+import NonPlayer, { type Data } from "./NonPlayer";
 import Player from "./Player";
 
 export default function Root() {
@@ -8,17 +8,21 @@ export default function Root() {
   return (
     <div>
       {src && <Player src={src} />}
-      <LibraryWrapper setSrc={setSrc} />
+      <NonPlayerWrapper setSrc={setSrc} />
     </div>
   );
 }
 
-class LibraryWrapper extends _firebase._FirebaseWrapper<
-  LibraryType,
+class NonPlayerWrapper extends _firebase._FirebaseWrapper<
+  Data,
   { setSrc: (src: string) => void }
 > {
   render() {
-    return !this.state?.state ? <></> : <Library library={this.state?.state} />;
+    return !this.state?.state ? (
+      <></>
+    ) : (
+      <NonPlayer data={this.state?.state} setSrc={this.props.setSrc} />
+    );
   }
   getFirebasePath(): string {
     return "/root";
