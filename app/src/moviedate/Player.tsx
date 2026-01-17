@@ -9,7 +9,14 @@ export default function Player(playerConfig: PlayerConfig) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const [chromecastInitialized, setChromecastInitialized] = useState(false);
-  useEffect(() => Chromecast.initializeScript(setChromecastInitialized), []);
+  useEffect(
+    () =>
+      void (
+        !chromecastInitialized &&
+        Chromecast.initializeScript(setChromecastInitialized)
+      ),
+    [],
+  );
   useEffect(
     () => void (chromecastInitialized && Chromecast.initializeVideo(videoRef)),
     [chromecastInitialized, videoRef],
