@@ -1,4 +1,5 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import _firebase from "./_firebase";
 import type { PlayerConfig } from "./Player";
 import { rootPath } from "./Root";
@@ -23,15 +24,24 @@ export default function NonPlayer({
       _firebase._set(libraryPath(path), src);
     }
   }
+  const [searchParams] = useSearchParams();
+  const key = searchParams.get("key");
+  console.log({ key });
+  useEffect(() => {
+    if (!key) return;
+    const src = data?.library?.[key];
+    if (!src) return;
+    setPlayerConfig({ src });
+  }, [data?.library, key, setPlayerConfig]);
   return (
     <div>
       <ul>
-        {Object.entries(data?.library ?? []).map(([key, src]) => (
+        {Object.keys(data?.library ?? []).map((key) => (
           <li key={key}>
             <button onClick={() => _firebase._set(libraryPath(key), null)}>
               ❌
             </button>
-            <button onClick={() => setPlayerConfig({ src })}>{key}</button>
+            <button onClick={() => searchParams.set("key", key)}>{key}</button>
           </li>
         ))}
       </ul>
