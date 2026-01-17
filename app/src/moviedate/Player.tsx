@@ -1,11 +1,13 @@
-export type PlayerConfig = { src: string };
+export type LibraryValue = { src: string; subs?: string };
 
-export default function Player({ src }: PlayerConfig) {
+export type PlayerConfig = LibraryValue & {};
+
+export default function Player(playerConfig: PlayerConfig) {
   return (
     <div>
       <div style={{ width: "100vW", height: "100vH" }}>
         <video
-          src={src}
+          src={playerConfig.src}
           controls
           style={{
             width: "100%",
