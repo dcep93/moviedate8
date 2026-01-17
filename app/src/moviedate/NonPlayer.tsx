@@ -1,25 +1,49 @@
+import { useRef } from "react";
+import _firebase from "./_firebase";
+import type { PlayerConfig } from "./Player";
+import { rootPath } from "./Root";
+
 export type Data = {
-  [key: string]: string;
+  library: { [key: string]: string };
 };
 
-export default function Library({
-  data: library,
-  setSrc,
+export default function NonPlayer({
+  data,
+  setPlayerConfig,
 }: {
   data: Data;
-  setSrc: (src: string) => void;
+  setPlayerConfig: (playerConfig: PlayerConfig) => void;
 }) {
+  const pathInputRef = useRef<HTMLInputElement>(null);
+  const srcInputRef = useRef<HTMLInputElement>(null);
+  function submit() {
+    const path = pathInputRef.current?.value;
+    const src = srcInputRef.current?.value;
+    if (path && src) {
+      _firebase._set(libraryPath(path), src);
+    }
+  }
   return (
     <div>
-      <h1>Library</h1>
       <ul>
-        {library &&
-          Object.entries(library).map(([key, value]) => (
-            <li key={key}>
-              <button onClick={() => setSrc(value)}>{key}</button>
-            </li>
-          ))}
+        {Object.entries(data.library).map(([key, src]) => (
+          <li key={key}>
+            <button onClick={() => _firebase._set(libraryPath(key), null)}>
+              ❌
+            </button>
+            <button onClick={() => setPlayerConfig({ src })}>{key}</button>
+          </li>
+        ))}
       </ul>
+      <div>
+        <input ref={pathInputRef} onSubmit={submit} />
+        <input ref={srcInputRef} onSubmit={submit} />
+        <button onClick={submit}>💾</button>
+      </div>
     </div>
   );
+}
+
+function libraryPath(key: string) {
+  return `${rootPath}/library/${key}`;
 }

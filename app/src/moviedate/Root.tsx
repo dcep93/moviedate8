@@ -1,30 +1,35 @@
 import { useState } from "react";
 import _firebase from "./_firebase";
 import NonPlayer, { type Data } from "./NonPlayer";
-import Player from "./Player";
+import Player, { type PlayerConfig } from "./Player";
+
+export const rootPath = "/root";
 
 export default function Root() {
-  const [src, setSrc] = useState<string | null>(null);
+  const [playerConfig, setPlayerConfig] = useState<PlayerConfig | null>(null);
   return (
     <div>
-      {src && <Player src={src} />}
-      <NonPlayerWrapper setSrc={setSrc} />
+      {playerConfig && <Player {...playerConfig} />}
+      <NonPlayerWrapper setPlayerConfig={setPlayerConfig} />
     </div>
   );
 }
 
 class NonPlayerWrapper extends _firebase._FirebaseWrapper<
   Data,
-  { setSrc: (src: string) => void }
+  { setPlayerConfig: (playerConfig: PlayerConfig) => void }
 > {
   render() {
     return !this.state?.state ? (
       <></>
     ) : (
-      <NonPlayer data={this.state?.state} setSrc={this.props.setSrc} />
+      <NonPlayer
+        data={this.state.state}
+        setPlayerConfig={this.props.setPlayerConfig}
+      />
     );
   }
   getFirebasePath(): string {
-    return "/root";
+    return rootPath;
   }
 }

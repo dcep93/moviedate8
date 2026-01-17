@@ -1,4 +1,6 @@
-export default function Player({ src }: { src: string }) {
+export type PlayerConfig = { src: string };
+
+export default function Player({ src }: PlayerConfig) {
   return (
     <div>
       <div style={{ width: "100vW", height: "100vH" }}>
