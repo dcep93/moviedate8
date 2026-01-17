@@ -1,4 +1,4 @@
-import type { RefObject } from "react";
+import type { DetailedHTMLProps, HTMLAttributes, RefObject } from "react";
 
 type CastMediaInfo = {
   contentId: string;
@@ -22,7 +22,39 @@ declare global {
             getCurrentSession(): {
               loadMedia(request: CastLoadRequest): Promise<void>;
             } | null;
+            addEventListener(
+              eventType: string,
+              listener: (event: { sessionState?: string }) => void,
+            ): void;
+            requestSession?: () => Promise<void>;
           };
+        };
+        CastContextEventType?: {
+          SESSION_STATE_CHANGED: string;
+        };
+        SessionState?: {
+          SESSION_STARTED: string;
+          SESSION_RESUMED: string;
+        };
+        RemotePlayer: new () => {
+          isConnected: boolean;
+          isPaused: boolean;
+          currentTime: number;
+          duration: number;
+        };
+        RemotePlayerController: new (player: {
+          isConnected: boolean;
+          isPaused: boolean;
+          currentTime: number;
+          duration: number;
+        }) => {
+          playOrPause: () => void;
+          seek: () => void;
+          stop: () => void;
+          addEventListener: (eventType: string, listener: () => void) => void;
+        };
+        RemotePlayerEventType?: {
+          IS_CONNECTED_CHANGED: string;
         };
       };
     };
@@ -41,6 +73,17 @@ declare const chrome: {
     };
   };
 };
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      "google-cast-launcher": DetailedHTMLProps<
+        HTMLAttributes<HTMLElement>,
+        HTMLElement
+      >;
+    }
+  }
+}
 
 const initializeScript = (
   setChromecastInitialized: (chromecastInitialized: boolean) => void,
@@ -66,63 +109,179 @@ const initializeScript = (
 const initializeVideo = (videoRef: RefObject<HTMLVideoElement | null>) => {
   const current = videoRef.current;
   if ("mediaSession" in navigator && current) {
-    navigator.mediaSession.setActionHandler("play", () => current.play());
-    navigator.mediaSession.setActionHandler("pause", () => current.pause());
-    navigator.mediaSession.setActionHandler("seekbackward", (details) => {
-      current.currentTime = Math.max(
-        current.currentTime - (details.seekOffset || 10),
-        0,
-      );
-    });
-    navigator.mediaSession.setActionHandler("seekforward", (details) => {
-      current.currentTime = Math.min(
-        current.currentTime + (details.seekOffset || 10),
-        current.duration,
-      );
-    });
-    navigator.mediaSession.setActionHandler("seekto", (details) => {
-      if (details.seekTime !== undefined) {
-        if (details.fastSeek && "fastSeek" in current) {
-          current.fastSeek(details.seekTime);
-        } else {
-          current.currentTime = details.seekTime;
-        }
+    const castFramework = window.cast?.framework;
+    const castContext = castFramework?.CastContext.getInstance();
+    const remotePlayer = castFramework
+      ? new castFramework.RemotePlayer()
+      : null;
+    const remotePlayerController =
+      castFramework && remotePlayer
+        ? new castFramework.RemotePlayerController(remotePlayer)
+        : null;
+
+    const loadRemoteMedia = () => {
+      if (!castContext || !current) {
+        return;
       }
-    });
+
+      const session = castContext.getCurrentSession();
+      const source = current.currentSrc || current.src;
+      if (!session || !source) {
+        return;
+      }
+
+      const mediaInfo = new chrome.cast.media.MediaInfo(source, "video/mp4");
+      const request = new chrome.cast.media.LoadRequest(mediaInfo);
+
+      session.loadMedia(request).then(
+        () => {
+          current.pause();
+          console.log("Media loaded successfully to Chromecast");
+        },
+        (error) => console.error("Error loading media to Chromecast", error),
+      );
+    };
+
+    if (castFramework?.RemotePlayerEventType && remotePlayerController) {
+      remotePlayerController.addEventListener(
+        castFramework.RemotePlayerEventType.IS_CONNECTED_CHANGED,
+        () => {
+          if (remotePlayer?.isConnected) {
+            current.pause();
+          }
+        },
+      );
+    }
+
+    if (
+      castFramework?.CastContextEventType &&
+      castFramework?.SessionState &&
+      castContext
+    ) {
+      castContext.addEventListener(
+        castFramework.CastContextEventType.SESSION_STATE_CHANGED,
+        (event) => {
+          if (
+            event.sessionState ===
+              castFramework.SessionState?.SESSION_STARTED ||
+            event.sessionState === castFramework.SessionState?.SESSION_RESUMED
+          ) {
+            loadRemoteMedia();
+          }
+        },
+      );
+    }
+
+    const applyRemoteOrLocal = (
+      localAction: () => void,
+      remoteAction: () => void,
+    ) => {
+      if (remotePlayer?.isConnected) {
+        remoteAction();
+      } else {
+        localAction();
+      }
+    };
+
+    navigator.mediaSession.setActionHandler("play", () =>
+      applyRemoteOrLocal(
+        () => current.play(),
+        () => {
+          if (!remotePlayerController || !remotePlayer) {
+            return;
+          }
+          if (remotePlayer.isPaused) {
+            remotePlayerController.playOrPause();
+          }
+        },
+      ),
+    );
+    navigator.mediaSession.setActionHandler("pause", () =>
+      applyRemoteOrLocal(
+        () => current.pause(),
+        () => {
+          if (!remotePlayerController || !remotePlayer) {
+            return;
+          }
+          if (!remotePlayer.isPaused) {
+            remotePlayerController.playOrPause();
+          }
+        },
+      ),
+    );
+    navigator.mediaSession.setActionHandler("seekbackward", (details) =>
+      applyRemoteOrLocal(
+        () => {
+          current.currentTime = Math.max(
+            current.currentTime - (details.seekOffset || 10),
+            0,
+          );
+        },
+        () => {
+          if (!remotePlayer || !remotePlayerController) {
+            return;
+          }
+          remotePlayer.currentTime = Math.max(
+            remotePlayer.currentTime - (details.seekOffset || 10),
+            0,
+          );
+          remotePlayerController.seek();
+        },
+      ),
+    );
+    navigator.mediaSession.setActionHandler("seekforward", (details) =>
+      applyRemoteOrLocal(
+        () => {
+          current.currentTime = Math.min(
+            current.currentTime + (details.seekOffset || 10),
+            current.duration,
+          );
+        },
+        () => {
+          if (!remotePlayer || !remotePlayerController) {
+            return;
+          }
+          remotePlayer.currentTime = Math.min(
+            remotePlayer.currentTime + (details.seekOffset || 10),
+            remotePlayer.duration,
+          );
+          remotePlayerController.seek();
+        },
+      ),
+    );
+    navigator.mediaSession.setActionHandler("seekto", (details) =>
+      applyRemoteOrLocal(
+        () => {
+          if (details.seekTime !== undefined) {
+            if (details.fastSeek && "fastSeek" in current) {
+              current.fastSeek(details.seekTime);
+            } else {
+              current.currentTime = details.seekTime;
+            }
+          }
+        },
+        () => {
+          if (
+            details.seekTime === undefined ||
+            !remotePlayer ||
+            !remotePlayerController
+          ) {
+            return;
+          }
+          remotePlayer.currentTime = details.seekTime;
+          remotePlayerController.seek();
+        },
+      ),
+    );
     navigator.mediaSession.setActionHandler("stop", () =>
-      videoRef.current?.pause(),
+      applyRemoteOrLocal(
+        () => current.pause(),
+        () => remotePlayerController?.stop(),
+      ),
     );
     navigator.mediaSession.setActionHandler("previoustrack", null);
     navigator.mediaSession.setActionHandler("nexttrack", null);
 
-    navigator.mediaSession.setActionHandler(
-      "cast" as MediaSessionAction,
-      () => {
-        if (!window.cast || !window.cast.framework) {
-          console.error("Google Cast SDK not loaded.");
-          return;
-        }
-
-        const context = window.cast.framework.CastContext.getInstance();
-        const session = context.getCurrentSession();
-
-        if (session && videoRef.current) {
-          const mediaInfo = new chrome.cast.media.MediaInfo(
-            current.src,
-            "video/mp4",
-          );
-          const request = new chrome.cast.media.LoadRequest(mediaInfo);
-
-          session.loadMedia(request).then(
-            () => console.log("Media loaded successfully to Chromecast"),
-            (error) =>
-              console.error("Error loading media to Chromecast", error),
-          );
-        } else {
-          console.error("No active Chromecast session");
-        }
-      },
-    );
   }
 };
 

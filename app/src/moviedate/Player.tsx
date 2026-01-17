@@ -24,7 +24,7 @@ export default function Player(playerConfig: PlayerConfig) {
 
   return (
     <div>
-      <div style={{ width: "100vW", height: "100vH" }}>
+      <div style={{ width: "100vW", height: "100vH", position: "relative" }}>
         <video
           ref={videoRef}
           src={playerConfig.src}
@@ -35,6 +35,15 @@ export default function Player(playerConfig: PlayerConfig) {
             objectFit: "contain",
           }}
           x-webkit-airplay="allow"
+        />
+        <google-cast-launcher
+          style={{
+            position: "absolute",
+            right: 16,
+            bottom: 16,
+            width: 32,
+            height: 32,
+          }}
         />
       </div>
     </div>
