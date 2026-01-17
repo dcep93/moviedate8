@@ -20,13 +20,17 @@ export default function NonPlayer({
   const pathInputRef = useRef<HTMLInputElement>(null);
   const srcInputRef = useRef<HTMLInputElement>(null);
   const subsInputRef = useRef<HTMLInputElement>(null);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, _setSearchParams] = useSearchParams();
+  const setPath = (path: string) => {
+    searchParams.set(K_QUERY_PARAM, path);
+    _setSearchParams(searchParams);
+  };
   function submit() {
     const path = pathInputRef.current?.value;
     const src = srcInputRef.current?.value;
     const subs = subsInputRef.current?.value;
     if (path) {
-      searchParams.set(K_QUERY_PARAM, path);
+      setPath(path);
       if (src) {
         _firebase._set(libraryPath(path), !subs ? { src } : { src, subs });
       }
@@ -79,13 +83,7 @@ export default function NonPlayer({
               >
                 ❌
               </button>
-              <button
-                onClick={() =>
-                  setSearchParams((p) => (p.set(K_QUERY_PARAM, key), p))
-                }
-              >
-                {key}
-              </button>
+              <button onClick={() => setPath(key)}>{key}</button>
             </li>
           ))}
         </ul>
