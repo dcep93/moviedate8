@@ -1,5 +1,7 @@
 import Player from "./Player";
 
+import static_path from "./static_path.txt";
+
 export default function Static() {
-  return <Player src="https://example.org/video.mp4" />;
+  return <Player src={static_path} />;
 }

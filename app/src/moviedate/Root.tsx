@@ -1,3 +1,13 @@
+import { useState } from "react";
+import Library from "./Library";
+import Player from "./Player";
+
 export default function Root() {
-  return <div style={{ width: "100vW", height: "100vH" }}>moviedate.root</div>;
+  const [src, setSrc] = useState<string | null>(null);
+  return (
+    <div>
+      {src && <Player src={src} />}
+      <Library setSrc={setSrc} />
+    </div>
+  );
 }
