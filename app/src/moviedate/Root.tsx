@@ -20,7 +20,7 @@ class NonPlayerWrapper extends _firebase._FirebaseWrapper<
   { setPlayerConfig: (playerConfig: PlayerConfig) => void }
 > {
   render() {
-    return !this.state?.state ? (
+    return !this.state ? (
       <></>
     ) : (
       <NonPlayer

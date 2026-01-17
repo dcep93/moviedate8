@@ -1,3 +1,5 @@
+// https://console.firebase.google.com/u/0/project/moviedate8/database/moviedate8-default-rtdb/data
+
 import { initializeApp } from "firebase/app"; // no compat for new SDK
 import {
   Database,
@@ -11,7 +13,7 @@ import {
 } from "firebase/database";
 import React from "react";
 
-const project = "moviedate8";
+const project = "movied8";
 
 const config = {
   databaseURL: `https://${project}-default-rtdb.firebaseio.com/`,

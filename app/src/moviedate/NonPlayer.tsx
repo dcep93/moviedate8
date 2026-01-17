@@ -5,7 +5,7 @@ import { rootPath } from "./Root";
 
 export type Data = {
   library: { [key: string]: string };
-};
+} | null;
 
 export default function NonPlayer({
   data,
@@ -26,7 +26,7 @@ export default function NonPlayer({
   return (
     <div>
       <ul>
-        {Object.entries(data.library).map(([key, src]) => (
+        {Object.entries(data?.library ?? []).map(([key, src]) => (
           <li key={key}>
             <button onClick={() => _firebase._set(libraryPath(key), null)}>
               ❌
