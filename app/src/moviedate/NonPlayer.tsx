@@ -25,7 +25,7 @@ export default function NonPlayer({
     const src = srcInputRef.current?.value;
     const subs = subsInputRef.current?.value;
     if (path && src) {
-      _firebase._set(libraryPath(path), { src, subs });
+      _firebase._set(libraryPath(path), !subs ? { src } : { src, subs });
     }
   }
   const [searchParams, setSearchParams] = useSearchParams();
@@ -43,13 +43,37 @@ export default function NonPlayer({
     if (!srcInputRef.current) return;
     srcInputRef.current!.value = libraryConfig.src;
   }, [pathInputRef, srcInputRef, key, libraryConfig]);
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Enter") {
+        submit();
+      }
+    };
+
+    const pathInput = pathInputRef.current;
+    const srcInput = srcInputRef.current;
+    const subsInput = subsInputRef.current;
+
+    pathInput?.addEventListener("keydown", handleKeyDown);
+    srcInput?.addEventListener("keydown", handleKeyDown);
+    subsInput?.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      pathInput?.removeEventListener("keydown", handleKeyDown);
+      srcInput?.removeEventListener("keydown", handleKeyDown);
+      subsInput?.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [pathInputRef, srcInputRef, subsInputRef, submit]);
   return (
     <div>
       {!data ? null : (
         <ul>
-          {Object.keys(data.library ?? []).map((key) => (
+          {Object.entries(data.library ?? {}).map(([key, value]) => (
             <li key={key}>
-              <button onClick={() => _firebase._set(libraryPath(key), null)}>
+              <button
+                onClick={() => _firebase._set(libraryPath(key), null)}
+                title={JSON.stringify({ key, value }, null, 2)}
+              >
                 ❌
               </button>
               <button
