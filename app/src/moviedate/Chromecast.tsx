@@ -1,4 +1,40 @@
-import type { DetailedHTMLProps, HTMLAttributes, RefObject } from "react";
+import {
+  useEffect,
+  useState,
+  type DetailedHTMLProps,
+  type HTMLAttributes,
+  type RefObject,
+} from "react";
+
+export default function Chromecast({
+  videoRef,
+}: {
+  videoRef: RefObject<HTMLVideoElement | null>;
+}) {
+  const [chromecastInitialized, setChromecastInitialized] = useState(false);
+  useEffect(
+    () =>
+      void (
+        !chromecastInitialized && initializeScript(setChromecastInitialized)
+      ),
+    [],
+  );
+  useEffect(
+    () => void (chromecastInitialized && initializeVideo(videoRef)),
+    [chromecastInitialized, videoRef],
+  );
+  return (
+    <google-cast-launcher
+      style={{
+        position: "absolute",
+        right: 16,
+        bottom: 16,
+        width: 32,
+        height: 32,
+      }}
+    />
+  );
+}
 
 type CastMediaInfo = {
   contentId: string;
@@ -281,12 +317,5 @@ const initializeVideo = (videoRef: RefObject<HTMLVideoElement | null>) => {
     );
     navigator.mediaSession.setActionHandler("previoustrack", null);
     navigator.mediaSession.setActionHandler("nexttrack", null);
-
   }
 };
-
-const ex = {
-  initializeScript,
-  initializeVideo,
-};
-export default ex;
