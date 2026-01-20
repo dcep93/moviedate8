@@ -29,11 +29,15 @@ export default function NonPlayer({
     const path = pathInputRef.current?.value;
     const src = srcInputRef.current?.value;
     const subs = subsInputRef.current?.value;
-    if (path) {
-      setPath(path);
+    if (!path) {
       if (src) {
-        _firebase._set(libraryPath(path), !subs ? { src } : { src, subs });
+        setPlayerConfig(!subs ? { src } : { src, subs });
       }
+      return;
+    }
+    setPath(path);
+    if (src) {
+      _firebase._set(libraryPath(path), !subs ? { src } : { src, subs });
     }
   }
   const key = searchParams.get(K_QUERY_PARAM);
@@ -102,8 +106,7 @@ export default function NonPlayer({
           <input ref={subsInputRef} onSubmit={submit} />
         </div>
         <div>
-          <div>save</div>
-          <button onClick={submit}>💾</button>
+          <button onClick={submit}>Submit</button>
         </div>
       </div>
     </div>
