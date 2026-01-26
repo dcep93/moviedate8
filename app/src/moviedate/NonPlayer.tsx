@@ -20,6 +20,7 @@ export default function NonPlayer({
   const pathInputRef = useRef<HTMLInputElement>(null);
   const srcInputRef = useRef<HTMLInputElement>(null);
   const subsInputRef = useRef<HTMLInputElement>(null);
+  const localFileInputRef = useRef<HTMLInputElement>(null);
   const [searchParams, _setSearchParams] = useSearchParams();
   const setPath = (path: string) => {
     searchParams.set(K_QUERY_PARAM, path);
@@ -75,6 +76,18 @@ export default function NonPlayer({
       subsInput?.removeEventListener("keydown", handleKeyDown);
     };
   }, [pathInputRef, srcInputRef, subsInputRef, submit]);
+  function handleLocalFileChange() {
+    const file = localFileInputRef.current?.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result === "string") {
+        setPlayerConfig({ src: result });
+      }
+    };
+    reader.readAsDataURL(file);
+  }
   return (
     <div>
       {!data ? null : (
@@ -108,6 +121,14 @@ export default function NonPlayer({
         <div>
           <button onClick={submit}>Submit</button>
         </div>
+      </div>
+      <div style={{ marginTop: 8 }}>
+        <input
+          ref={localFileInputRef}
+          type="file"
+          accept="video/*"
+          onChange={handleLocalFileChange}
+        />
       </div>
     </div>
   );
