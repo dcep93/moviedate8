@@ -21,6 +21,7 @@ export default function NonPlayer({
   const srcInputRef = useRef<HTMLInputElement>(null);
   const subsInputRef = useRef<HTMLInputElement>(null);
   const localFileInputRef = useRef<HTMLInputElement>(null);
+  const localVideoUrlRef = useRef<string | null>(null);
   const [searchParams, _setSearchParams] = useSearchParams();
   const setPath = (path: string) => {
     searchParams.set(K_QUERY_PARAM, path);
@@ -76,17 +77,23 @@ export default function NonPlayer({
       subsInput?.removeEventListener("keydown", handleKeyDown);
     };
   }, [pathInputRef, srcInputRef, subsInputRef, submit]);
+  useEffect(() => {
+    return () => {
+      if (localVideoUrlRef.current) {
+        URL.revokeObjectURL(localVideoUrlRef.current);
+        localVideoUrlRef.current = null;
+      }
+    };
+  }, []);
   function handleLocalFileChange() {
     const file = localFileInputRef.current?.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result;
-      if (typeof result === "string") {
-        setPlayerConfig({ src: result });
-      }
-    };
-    reader.readAsDataURL(file);
+    if (localVideoUrlRef.current) {
+      URL.revokeObjectURL(localVideoUrlRef.current);
+    }
+    const url = URL.createObjectURL(file);
+    localVideoUrlRef.current = url;
+    setPlayerConfig({ src: url });
   }
   return (
     <div>
