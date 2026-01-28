@@ -95,6 +95,18 @@ export default function NonPlayer({
     localVideoUrlRef.current = url;
     setPlayerConfig({ src: url });
   }
+  function handleOpenAirplayDirect() {
+    const src =
+      srcInputRef.current?.value?.trim() ??
+      libraryConfig?.src ??
+      localVideoUrlRef.current ??
+      "";
+    if (!src) {
+      return;
+    }
+    const url = `/airplay?src=${encodeURIComponent(src)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
   return (
     <div>
       {!data ? null : (
@@ -127,6 +139,9 @@ export default function NonPlayer({
         </div>
         <div>
           <button onClick={submit}>Submit</button>
+          <button onClick={handleOpenAirplayDirect} style={{ marginLeft: 8 }}>
+            AirPlay direct
+          </button>
         </div>
       </div>
       <div style={{ marginTop: 8 }}>
