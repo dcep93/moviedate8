@@ -27,20 +27,25 @@ export default function NonPlayer({
     searchParams.set(K_QUERY_PARAM, path);
     _setSearchParams(searchParams);
   };
+  function openLocalFilePicker() {
+    if (!localFileInputRef.current) return;
+    localFileInputRef.current.value = "";
+    localFileInputRef.current.click();
+  }
   function submit() {
     const path = pathInputRef.current?.value;
-    const src = srcInputRef.current?.value;
+    const src = srcInputRef.current?.value.trim();
     const subs = subsInputRef.current?.value;
+    if (!src) {
+      openLocalFilePicker();
+      return;
+    }
     if (!path) {
-      if (src) {
-        setPlayerConfig(!subs ? { src } : { src, subs });
-      }
+      setPlayerConfig(!subs ? { src } : { src, subs });
       return;
     }
     setPath(path);
-    if (src) {
-      _firebase._set(libraryPath(path), !subs ? { src } : { src, subs });
-    }
+    _firebase._set(libraryPath(path), !subs ? { src } : { src, subs });
   }
   const key = searchParams.get(K_QUERY_PARAM);
   const libraryConfig = data?.library?.[key ?? ""];
