@@ -78,6 +78,8 @@ body { display: block; }
 .library ul { display: flex; gap: 1rem; flex-wrap: wrap; padding: 0; list-style: none; }
 .library form { display: flex; gap: .5rem; flex-wrap: wrap; align-items: end; margin-bottom: 1rem; }
 .library label { display: flex; flex-direction: column; }
+.library .statusbar { padding: .5rem 0; }
+.library .statusbar label { flex-direction: row; align-items: center; gap: .25rem; }
 .library input { padding: .5rem; }
 .entry-overlay { position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; background: #000; }
 .entry-overlay button { font-size: 2rem; color: #fff; background: transparent; }

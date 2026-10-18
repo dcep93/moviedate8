@@ -1,11 +1,11 @@
-import { useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useRef, useState, type ReactNode } from 'react';
 import { libraryValue, type LibraryValue } from './sync';
 import { validKey } from './playbackState';
 
-export default function NonPlayer({ library, currentKey, onSelect, onLocal, onLocalFile, onSave, onDelete, onError }: {
+export default function NonPlayer({ library, currentKey, statusBar, onSelect, onLocal, onLocalFile, onSave, onDelete, onError }: {
   library: Record<string, unknown>;
   currentKey: string | null;
+  statusBar: ReactNode;
   onSelect: (key: string) => void;
   onLocal: (value: LibraryValue) => void;
   onLocalFile: (file: File) => void;
@@ -46,7 +46,7 @@ export default function NonPlayer({ library, currentKey, onSelect, onLocal, onLo
       if (!file) return;
       onLocalFile(file);
     }} /></label>
-    <div><Link to="/f">Follow</Link></div>
+    {statusBar}
     <ul>{Object.entries(library).map(([key, value]) => <li key={key}>
       <button aria-label={`Delete ${key}`} onClick={() => void onDelete(key).catch(error => onError(String(error)))}>❌</button>{' '}
       <button onClick={() => {
