@@ -282,9 +282,9 @@ test('local files survive client-side route changes on the same video element', 
   await page.locator('video').evaluate((v: HTMLVideoElement) => v.play());
   await playing(page, true);
   await page.getByRole('link', { name: 'Follow', exact: true }).click();
-  await expect(page.getByText('Waiting for a movie selection.', { exact: true })).toBeVisible();
+  await expect(page.locator('.statusbar')).toHaveCount(0);
   await expect(page.locator('video')).not.toHaveAttribute('src');
-  await page.getByRole('link', { name: 'Library', exact: true }).click();
+  await page.goBack();
   await expect.poll(() => page.locator('video').evaluate((v: HTMLVideoElement) => v.currentSrc.startsWith('blob:') && v.readyState >= 2)).toBe(true);
   expect(await element!.evaluate(v => v === document.querySelector('video'))).toBe(true);
   await expect(page.getByRole('button', { name: 'Enter', exact: true })).toBeHidden();

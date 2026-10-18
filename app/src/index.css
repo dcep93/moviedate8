@@ -70,6 +70,7 @@ button:focus-visible {
 body { display: block; }
 #root { width: 100%; }
 .player { width: 100%; height: 80vh; position: relative; background: #000; }
+.player--follower { height: 100vh; height: 100dvh; }
 .player video { display: block; width: 100%; height: 100%; object-fit: contain; }
 .statusbar { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; padding: 1rem; }
 .statusbar p { width: 100%; color: #e66; }

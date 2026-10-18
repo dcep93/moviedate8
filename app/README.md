@@ -5,12 +5,12 @@ A browser video library with Firebase playback synchronization. Run `npm install
 ## Playback
 
 - Open `/?k=movie-key` or select a library movie to make it the globally selected movie. Sync is on by default. Clients on the same key share intentional play, pause, seek, and playback-rate changes; the latest action wins. Joining resumes the saved state instead of resetting the movie. Selecting an existing movie retains its state; new movies start paused at zero.
-- `/f` follows the global selection and its playback, with read-only playback controls. Followers never choose the global key or publish playback.
+- `/f` follows the global selection and its playback in a full-viewport player, without navigation, status text, or counts. Followers never choose the global key or publish playback.
 - Turn **Sync** off to use local playback. Turning it back on adopts the shared state. Background playback, received changes, and drift correction never change the global selection.
 - `/s?src=https://example.com/movie.mp4` and local file selection remain available without shared playback. An empty path in the library form plays an unsaved URL. Existing `/s` without a source uses the bundled default URL.
 - A fullscreen **Enter** overlay initially covers every route. The same persistent video element first attempts a short bundled silent clip with a real AAC audio track, unmuted at normal volume. Only a successful `play()` promise dismisses the overlay; otherwise Enter retries directly from the click. The latest movie state is then restored, including paused state. Later browser autoplay denial restores Enter. There is no stored permission flag.
 - Counts show connected tabs watching the current key and all connected `/f` tabs, including your own. Counts can lag abrupt network disconnection. No account is required.
-- Connection, database permissions/write failures, invalid or missing sources, and media-load failures appear below the player. Offline playback stays local. Offline actions are discarded rather than replayed on reconnect; reconnection adopts the current shared state.
+- Outside `/f`, connection, database permissions/write failures, invalid or missing sources, and media-load failures appear below the player. Offline playback stays local. Offline actions are discarded rather than replayed on reconnect; reconnection adopts the current shared state.
 
 The video DOM element stays mounted across library, source, and route changes. Chromecast launching remains available; synchronization of an actual cast receiver is outside this feature. Browser autoplay rules still vary by browser and device; a successful desktop test does not establish Safari/iOS behavior on physical hardware.
 

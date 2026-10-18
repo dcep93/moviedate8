@@ -94,14 +94,13 @@ export default function Root() {
   return <>
     <main inert={gate}>
     <Player videoRef={videoRef} follower={follower} subs={config?.subs} />
-    <div className="statusbar">
+    {!follower && <div className="statusbar">
       <nav><Link to="/">Library</Link> · <Link to="/f">Follow</Link></nav>
-      <span role="status">{connected ? 'Connected' : 'Disconnected — changes are local'}{follower ? ' · Following' : ''}{safeKey ? ` · ${safeKey}` : ''}</span>
-      {!follower && <label><input type="checkbox" checked={syncEnabled} onChange={event => setSyncEnabled(event.target.checked)} /> Sync</label>}
+      <span role="status">{connected ? 'Connected' : 'Disconnected — changes are local'}{safeKey ? ` · ${safeKey}` : ''}</span>
+      <label><input type="checkbox" checked={syncEnabled} onChange={event => setSyncEnabled(event.target.checked)} /> Sync</label>
       <span>{viewers} viewers · {followers} followers</span>
-      {follower && !safeKey && ready && <span>Waiting for a movie selection.</span>}
       {(error || mediaError || missing) && <p role="alert">{error || mediaError || missing}</p>}
-    </div>
+    </div>}
     {!staticRoute && !follower && <NonPlayer library={data.library || {}} currentKey={safeKey}
       onSelect={select} onError={setError}
       onLocal={value => { setLocal(value); navigate('/'); }}
