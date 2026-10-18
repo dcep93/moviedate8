@@ -352,3 +352,38 @@ test('write rejection is visible and restores authoritative playback', async ({ 
   await playing(page, false);
   expect(await read('/playback/example1')).toBeNull();
 });
+
+test('write count is local, counts successful requests, and survives reloads', async ({ browser }) => {
+  const first = await client(browser, '/?k=example1');
+  await enter(first);
+  await loaded(first, 'one');
+  const second = await client(browser, '/?k=example1');
+  await enter(second);
+  await loaded(second, 'one');
+  const count = async (page: Page) => Number((await page.getByText(/^\d+ writes$/).innerText()).split(' ')[0]);
+  // Each tab registers presence and announces its initial key selection.
+  await expect.poll(() => count(first)).toBeGreaterThanOrEqual(2);
+  await expect.poll(() => count(second)).toBeGreaterThanOrEqual(2);
+  const firstBefore = await count(first);
+  const secondBefore = await count(second);
+
+  await first.locator('video').evaluate((v: HTMLVideoElement) => v.play());
+  await playing(second, true);
+  await expect.poll(() => count(first)).toBe(firstBefore + 1);
+  expect(await count(second)).toBe(secondBefore);
+
+  await first.route(`${database}.json`, async route => {
+    if (route.request().method() === 'PATCH') {
+      await route.fulfill({ status: 403, contentType: 'application/json', body: '{"error":"Permission denied"}' });
+    } else await route.continue();
+  });
+  await first.locator('video').evaluate((v: HTMLVideoElement) => v.pause());
+  await expect(first.getByRole('alert')).toContainText('Database write failed (403)');
+  expect(await count(first)).toBe(firstBefore + 1);
+  await first.unroute(`${database}.json`);
+
+  await first.reload();
+  await enter(first);
+  await loaded(first, 'one');
+  await expect.poll(() => count(first)).toBeGreaterThanOrEqual(firstBefore + 3);
+});

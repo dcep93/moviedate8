@@ -7,6 +7,8 @@ import { parsePlayback, validKey } from './playbackState';
 import { PlaybackController } from './PlaybackController';
 import staticPath from './static_path.txt?raw';
 
+const WRITE_COUNT_KEY = 'movied8:sessionWrites';
+
 export default function Root() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -17,6 +19,12 @@ export default function Root() {
   const [data, setData] = useState<SharedData>({});
   const [ready, setReady] = useState(false);
   const [connected, setConnected] = useState(false);
+  const [writeCount, setWriteCount] = useState(() => {
+    try {
+      const count = Number(sessionStorage.getItem(WRITE_COUNT_KEY));
+      return Number.isSafeInteger(count) && count >= 0 ? count : 0;
+    } catch { return 0; }
+  });
   const [syncEnabled, setSyncEnabled] = useState(true);
   const [gate, setGate] = useState(true);
   const [error, setError] = useState('');
@@ -35,9 +43,14 @@ export default function Root() {
   const shared = !!safeKey && !!config && ready && connected && (follower || syncEnabled);
   const actionRef = useRef({ safeKey, shared, follower });
 
+  useEffect(() => {
+    try { sessionStorage.setItem(WRITE_COUNT_KEY, String(writeCount)); }
+    catch { /* Keep an in-memory count if browser storage is unavailable. */ }
+  }, [writeCount]);
   useEffect(() => { actionRef.current = { safeKey, shared, follower }; }, [safeKey, shared, follower]);
   useEffect(() => {
-    const connection = new SyncConnection(value => { setData(value); setReady(true); }, setConnected, setError);
+    const connection = new SyncConnection(value => { setData(value); setReady(true); }, setConnected, setError,
+      () => setWriteCount(count => count + 1));
     connectionRef.current = connection;
     const controller = new PlaybackController(videoRef.current!, () => connection.now(), value => {
       const current = actionRef.current;
@@ -94,6 +107,7 @@ export default function Root() {
     <Link to="/f">Follow</Link>
     <label><input type="checkbox" checked={syncEnabled} onChange={event => setSyncEnabled(event.target.checked)} /> Sync{!connected && ' (offline)'}</label>
     <span>{viewers} {viewers === 1 ? 'follower' : 'followers'}</span>
+    <span>{writeCount} writes</span>
     {(error || mediaError || missing) && <p role="alert">{error || mediaError || missing}</p>}
   </div>;
   return <>

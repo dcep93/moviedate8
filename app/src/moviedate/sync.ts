@@ -36,10 +36,12 @@ export class SyncConnection {
   private writes = new WriteQueue();
   private onStatus: (connected: boolean) => void;
   private onError: (error: string) => void;
+  private onWrite: () => void;
 
-  constructor(onData: (value: SharedData) => void, onStatus: (connected: boolean) => void, onError: (error: string) => void) {
+  constructor(onData: (value: SharedData) => void, onStatus: (connected: boolean) => void, onError: (error: string) => void, onWrite: () => void) {
     this.onStatus = onStatus;
     this.onError = onError;
+    this.onWrite = onWrite;
     const failure = (error: Error) => onError(`Database permission/read error: ${error.message}`);
     this.cleanups.push(onValue(ref(database, rootPath), snap => onData(snap.val() || {}), failure));
     this.cleanups.push(onValue(ref(database, '.info/serverTimeOffset'), snap => { this.offset = Number(snap.val()) || 0; }));
@@ -71,7 +73,8 @@ export class SyncConnection {
       if (this.disposed || !this.connected || version !== this.presenceVersion) return;
       // set only after the disconnect handler is acknowledged; no stale registration on reconnect.
       await set(presenceRef, this.presence);
-      if (this.disposed) { await remove(presenceRef); return; }
+      this.onWrite();
+      if (this.disposed) { await remove(presenceRef); this.onWrite(); return; }
       this.presenceReady = true;
     } catch (error) { if (!this.disposed) this.onError(`Presence error: ${String(error)}`); }
   }
@@ -83,6 +86,7 @@ export class SyncConnection {
         body: JSON.stringify(typeof values === 'function' ? values() : values), signal,
       });
       if (!response.ok) throw new Error(`Database write failed (${response.status}): ${await response.text()}`);
+      this.onWrite();
     });
   }
 
@@ -100,7 +104,11 @@ export class SyncConnection {
   }
 
   private leave = () => {
-    if (this.presenceReady && this.connected) void remove(ref(database, `${rootPath}/presence/${this.id}`));
+    if (this.presenceReady && this.connected) {
+      void remove(ref(database, `${rootPath}/presence/${this.id}`)).then(this.onWrite).catch(error => {
+        if (!this.disposed) this.onError(`Presence error: ${String(error)}`);
+      });
+    }
   };
 
   dispose() {
