@@ -1,29 +1,15 @@
-import { useRef } from "react";
-import Chromecast from "./Chromecast";
+import type { RefObject } from 'react';
+import Chromecast from './Chromecast';
 
-export type LibraryValue = { src: string; subs?: string };
-
-export type PlayerConfig = LibraryValue & {};
-
-export default function Player(playerConfig: PlayerConfig) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  return (
-    <div>
-      <div style={{ width: "100vW", height: "100vH", position: "relative" }}>
-        <video
-          ref={videoRef}
-          src={playerConfig.src}
-          controls
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-          }}
-          x-webkit-airplay="allow"
-        />
-        <Chromecast videoRef={videoRef} />
-      </div>
-    </div>
-  );
+export default function Player({ videoRef, follower, subs }: {
+  videoRef: RefObject<HTMLVideoElement | null>;
+  follower: boolean;
+  subs?: string;
+}) {
+  return <div className="player">
+    <video ref={videoRef} controls={!follower} playsInline preload="auto" x-webkit-airplay="allow">
+      {subs && <track key={subs} kind="subtitles" src={subs} label="Subtitles" default />}
+    </video>
+    <Chromecast videoRef={videoRef} />
+  </div>;
 }

@@ -99,6 +99,8 @@ declare const chrome: {
 };
 
 declare module "react/jsx-runtime" {
+  // JSX custom-element augmentation requires this TypeScript namespace.
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
     interface IntrinsicElements {
       "google-cast-launcher": DetailedHTMLProps<

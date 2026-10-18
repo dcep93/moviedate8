@@ -1,151 +1,57 @@
-import { useEffect, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
-import _firebase from "./_firebase";
-import type { LibraryValue, PlayerConfig } from "./Player";
-import { rootPath } from "./Root";
+import { useRef, useState } from 'react';
+import { libraryValue, type LibraryValue } from './sync';
+import { validKey } from './playbackState';
 
-const K_QUERY_PARAM = "k";
-
-export type Data = {
-  library: { [key: string]: LibraryValue };
-} | null;
-
-export default function NonPlayer({
-  data,
-  setPlayerConfig,
-}: {
-  data: Data;
-  setPlayerConfig: (playerConfig: PlayerConfig) => void;
+export default function NonPlayer({ library, currentKey, onSelect, onLocal, onLocalFile, onSave, onDelete, onError }: {
+  library: Record<string, unknown>;
+  currentKey: string | null;
+  onSelect: (key: string) => void;
+  onLocal: (value: LibraryValue) => void;
+  onLocalFile: (file: File) => void;
+  onSave: (key: string, value: LibraryValue) => Promise<void>;
+  onDelete: (key: string) => Promise<void>;
+  onError: (error: string) => void;
 }) {
-  const pathInputRef = useRef<HTMLInputElement>(null);
-  const srcInputRef = useRef<HTMLInputElement>(null);
-  const subsInputRef = useRef<HTMLInputElement>(null);
-  const localFileInputRef = useRef<HTMLInputElement>(null);
-  const localVideoUrlRef = useRef<string | null>(null);
-  const [searchParams, _setSearchParams] = useSearchParams();
-  const setPath = (path: string) => {
-    searchParams.set(K_QUERY_PARAM, path);
-    _setSearchParams(searchParams);
-  };
-  function openLocalFilePicker() {
-    if (!localFileInputRef.current) return;
-    localFileInputRef.current.value = "";
-    localFileInputRef.current.click();
+  const selected = currentKey ? libraryValue(library[currentKey]) : null;
+  const selection = JSON.stringify([currentKey, selected]);
+  const [lastSelection, setLastSelection] = useState(selection);
+  const [path, setPath] = useState(currentKey || '');
+  const [src, setSrc] = useState(selected?.src || '');
+  const [subs, setSubs] = useState(selected?.subs || '');
+  if (selection !== lastSelection) {
+    setLastSelection(selection);
+    setPath(currentKey || ''); setSrc(selected?.src || ''); setSubs(selected?.subs || '');
   }
-  function submit() {
-    const path = pathInputRef.current?.value;
-    const src = srcInputRef.current?.value.trim();
-    const subs = subsInputRef.current?.value;
-    if (!src) {
-      openLocalFilePicker();
-      return;
-    }
-    if (!path) {
-      setPlayerConfig(!subs ? { src } : { src, subs });
-      return;
-    }
-    setPath(path);
-    _firebase._set(libraryPath(path), !subs ? { src } : { src, subs });
+  const fileInput = useRef<HTMLInputElement>(null);
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    if (!src.trim()) { fileInput.current?.click(); return; }
+    const value = libraryValue({ src: src.trim(), subs: subs.trim() });
+    if (!value) { onError('Source must be an http or https video URL.'); return; }
+    if (!path.trim()) { onLocal(value); return; }
+    if (!validKey(path.trim())) { onError('Movie keys cannot contain . # $ [ ] / or control characters.'); return; }
+    try { await onSave(path.trim(), value); onSelect(path.trim()); }
+    catch (error) { onError(String(error)); }
   }
-  const key = searchParams.get(K_QUERY_PARAM);
-  const libraryConfig = data?.library?.[key ?? ""];
-  useEffect(() => {
-    if (!libraryConfig) return;
-    setPlayerConfig(libraryConfig);
-  }, [data?.library, libraryConfig, setPlayerConfig]);
-  useEffect(() => {
-    if (!key) return;
-    if (!pathInputRef.current) return;
-    pathInputRef.current!.value = key;
-    if (!libraryConfig) return;
-    if (!srcInputRef.current) return;
-    srcInputRef.current!.value = libraryConfig.src;
-  }, [pathInputRef, srcInputRef, key, libraryConfig]);
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Enter") {
-        submit();
-      }
-    };
-
-    const pathInput = pathInputRef.current;
-    const srcInput = srcInputRef.current;
-    const subsInput = subsInputRef.current;
-
-    pathInput?.addEventListener("keydown", handleKeyDown);
-    srcInput?.addEventListener("keydown", handleKeyDown);
-    subsInput?.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      pathInput?.removeEventListener("keydown", handleKeyDown);
-      srcInput?.removeEventListener("keydown", handleKeyDown);
-      subsInput?.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [pathInputRef, srcInputRef, subsInputRef, submit]);
-  useEffect(() => {
-    return () => {
-      if (localVideoUrlRef.current) {
-        URL.revokeObjectURL(localVideoUrlRef.current);
-        localVideoUrlRef.current = null;
-      }
-    };
-  }, []);
-  function handleLocalFileChange() {
-    const file = localFileInputRef.current?.files?.[0];
-    if (!file) return;
-    if (localVideoUrlRef.current) {
-      URL.revokeObjectURL(localVideoUrlRef.current);
-    }
-    const url = URL.createObjectURL(file);
-    localVideoUrlRef.current = url;
-    setPlayerConfig({ src: url });
-  }
-  return (
-    <div>
-      {!data ? null : (
-        <ul>
-          {Object.entries(data.library ?? {}).map(([key, value]) => (
-            <li key={key}>
-              <button
-                onClick={() => _firebase._set(libraryPath(key), null)}
-                title={JSON.stringify({ key, value }, null, 2)}
-              >
-                ❌
-              </button>
-              <button onClick={() => setPath(key)}>{key}</button>
-            </li>
-          ))}
-        </ul>
-      )}
-      <div style={{ display: "flex" }}>
-        <div>
-          <div>path</div>
-          <input ref={pathInputRef} onSubmit={submit} />
-        </div>
-        <div>
-          <div>src</div>
-          <input ref={srcInputRef} onSubmit={submit} />
-        </div>
-        <div>
-          <div>subs</div>
-          <input ref={subsInputRef} onSubmit={submit} />
-        </div>
-        <div>
-          <button onClick={submit}>Submit</button>
-        </div>
-      </div>
-      <div style={{ marginTop: 8 }}>
-        <input
-          ref={localFileInputRef}
-          type="file"
-          accept="video/*"
-          onChange={handleLocalFileChange}
-        />
-      </div>
-    </div>
-  );
-}
-
-function libraryPath(key: string) {
-  return `${rootPath}/library/${key}`;
+  return <section className="library">
+    <h1>MovieD8</h1>
+    <ul>{Object.entries(library).map(([key, value]) => <li key={key}>
+      <button aria-label={`Delete ${key}`} onClick={() => void onDelete(key).catch(error => onError(String(error)))}>❌</button>{' '}
+      <button onClick={() => {
+        const movie = libraryValue(value);
+        setPath(key); setSrc(movie?.src || ''); setSubs(movie?.subs || ''); onSelect(key);
+      }}>{key}</button>
+    </li>)}</ul>
+    <form onSubmit={event => void submit(event)}>
+      <label>path<input value={path} onChange={event => setPath(event.target.value)} /></label>
+      <label>src<input value={src} onChange={event => setSrc(event.target.value)} /></label>
+      <label>subs<input value={subs} onChange={event => setSubs(event.target.value)} /></label>
+      <button type="submit">Submit</button>
+    </form>
+    <label>Local video<input ref={fileInput} type="file" accept="video/*" onChange={event => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      onLocalFile(file);
+    }} /></label>
+  </section>;
 }
