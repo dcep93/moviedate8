@@ -34,7 +34,6 @@ export default function NonPlayer({ library, currentKey, onSelect, onLocal, onLo
     catch (error) { onError(String(error)); }
   }
   return <section className="library">
-    <h1>MovieD8</h1>
     <ul>{Object.entries(library).map(([key, value]) => <li key={key}>
       <button aria-label={`Delete ${key}`} onClick={() => void onDelete(key).catch(error => onError(String(error)))}>❌</button>{' '}
       <button onClick={() => {

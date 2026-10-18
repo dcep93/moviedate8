@@ -89,16 +89,14 @@ export default function Root() {
   }
   const presence = Object.values(data.presence || {});
   const viewers = safeKey ? presence.filter(value => value?.key === safeKey).length : 0;
-  const followers = presence.filter(value => value?.follower === true).length;
   const missing = key && !safeKey ? 'Invalid movie key.' : ready && safeKey && !config ? `Missing or invalid source for “${safeKey}”.` : '';
   return <>
     <main inert={gate}>
     <Player videoRef={videoRef} follower={follower} subs={config?.subs} />
     {!follower && <div className="statusbar">
-      <nav><Link to="/">Library</Link> · <Link to="/f">Follow</Link></nav>
-      <span role="status">{connected ? 'Connected' : 'Disconnected — changes are local'}{safeKey ? ` · ${safeKey}` : ''}</span>
-      <label><input type="checkbox" checked={syncEnabled} onChange={event => setSyncEnabled(event.target.checked)} /> Sync</label>
-      <span>{viewers} viewers · {followers} followers</span>
+      <Link to="/f">Follow</Link>
+      <label><input type="checkbox" checked={syncEnabled} onChange={event => setSyncEnabled(event.target.checked)} /> Sync{!connected && ' (offline)'}</label>
+      <span>{viewers} {viewers === 1 ? 'follower' : 'followers'}</span>
       {(error || mediaError || missing) && <p role="alert">{error || mediaError || missing}</p>}
     </div>}
     {!staticRoute && !follower && <NonPlayer library={data.library || {}} currentKey={safeKey}
