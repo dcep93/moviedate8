@@ -94,7 +94,7 @@ export default function Root() {
     <main inert={gate}>
     <Player videoRef={videoRef} follower={follower} subs={config?.subs} />
     {!follower && <div className="statusbar">
-      <Link to="/f">Follow</Link>
+      {staticRoute && <Link to="/f">Follow</Link>}
       <label><input type="checkbox" checked={syncEnabled} onChange={event => setSyncEnabled(event.target.checked)} /> Sync{!connected && ' (offline)'}</label>
       <span>{viewers} {viewers === 1 ? 'follower' : 'followers'}</span>
       {(error || mediaError || missing) && <p role="alert">{error || mediaError || missing}</p>}

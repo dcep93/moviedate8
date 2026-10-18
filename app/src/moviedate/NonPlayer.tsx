@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { libraryValue, type LibraryValue } from './sync';
 import { validKey } from './playbackState';
 
@@ -34,13 +35,6 @@ export default function NonPlayer({ library, currentKey, onSelect, onLocal, onLo
     catch (error) { onError(String(error)); }
   }
   return <section className="library">
-    <ul>{Object.entries(library).map(([key, value]) => <li key={key}>
-      <button aria-label={`Delete ${key}`} onClick={() => void onDelete(key).catch(error => onError(String(error)))}>❌</button>{' '}
-      <button onClick={() => {
-        const movie = libraryValue(value);
-        setPath(key); setSrc(movie?.src || ''); setSubs(movie?.subs || ''); onSelect(key);
-      }}>{key}</button>
-    </li>)}</ul>
     <form onSubmit={event => void submit(event)}>
       <label>path<input value={path} onChange={event => setPath(event.target.value)} /></label>
       <label>src<input value={src} onChange={event => setSrc(event.target.value)} /></label>
@@ -52,5 +46,13 @@ export default function NonPlayer({ library, currentKey, onSelect, onLocal, onLo
       if (!file) return;
       onLocalFile(file);
     }} /></label>
+    <div><Link to="/f">Follow</Link></div>
+    <ul>{Object.entries(library).map(([key, value]) => <li key={key}>
+      <button aria-label={`Delete ${key}`} onClick={() => void onDelete(key).catch(error => onError(String(error)))}>❌</button>{' '}
+      <button onClick={() => {
+        const movie = libraryValue(value);
+        setPath(key); setSrc(movie?.src || ''); setSubs(movie?.subs || ''); onSelect(key);
+      }}>{key}</button>
+    </li>)}</ul>
   </section>;
 }
